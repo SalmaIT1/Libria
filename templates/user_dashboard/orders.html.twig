@@ -1,0 +1,183 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes Commandes - Libria{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="book-title">
+            <i class="bi bi-box-seam me-2"></i>Mes Commandes
+        </h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ path('home') }}" class="text-decoration-none">Accueil</a></li>
+                <li class="breadcrumb-item"><a href="{{ path('user_dashboard') }}" class="text-decoration-none">Tableau de bord</a></li>
+                <li class="breadcrumb-item active">Mes Commandes</li>
+            </ol>
+        </nav>
+    </div>
+
+    {% if commandes is empty %}
+        <div class="library-card text-center p-5">
+            <i class="bi bi-box-seam" style="font-size: 4rem; color: var(--gray-light);"></i>
+            <h3 class="book-title mt-3">Vous n'avez pas encore de commandes</h3>
+            <p class="book-meta">Découvrez notre collection de livres et passez votre première commande !</p>
+            <a href="{{ path('books') }}" class="btn btn-library mt-3">
+                <i class="bi bi-book"></i> Parcourir les livres
+            </a>
+        </div>
+    {% else %}
+        {% for commande in commandes %}
+            <div class="library-card mb-4">
+                <div class="card-body p-4">
+                    <!-- Header de la commande -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h5 class="book-title mb-1">
+                                Commande #{{ commande.id }}
+                            </h5>
+                            <small class="text-muted">
+                                Passée le {{ commande.createdAt|date('d/m/Y à H:i') }}
+                            </small>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            {% set statusClass = {
+                                'pending': 'warning',
+                                'paid': 'info',
+                                'processing': 'primary',
+                                'shipped': 'success',
+                                'delivered': 'success',
+                                'cancelled': 'danger'
+                            } %}
+                            {% set statusLabel = {
+                                'pending': 'En attente',
+                                'paid': 'Payée',
+                                'processing': 'En préparation',
+                                'shipped': 'Expédiée',
+                                'delivered': 'Livrée',
+                                'cancelled': 'Annulée'
+                            } %}
+                            <span class="badge bg-{{ statusClass[commande.status] ?? 'secondary' }} fs-6">
+                                {{ statusLabel[commande.status] ?? commande.status }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Progress bar de livraison -->
+                    <div class="mb-4">
+                        {% set progressSteps = {
+                            'pending': 0,
+                            'paid': 25,
+                            'processing': 50,
+                            'shipped': 75,
+                            'delivered': 100
+                        } %}
+                        {% set currentProgress = progressSteps[commande.status] ?? 0 %}
+                        
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-library" role="progressbar" 
+                                 style="width: {{ currentProgress }}%"
+                                 aria-valuenow="{{ currentProgress }}" 
+                                 aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-2">
+                            <small class="text-muted">Commande</small>
+                            <small class="text-muted">Paiement</small>
+                            <small class="text-muted">Préparation</small>
+                            <small class="text-muted">Expédition</small>
+                            <small class="text-muted">Livraison</small>
+                        </div>
+                    </div>
+
+                    <!-- Livres de la commande -->
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h6 class="fw-semibold mb-3">Articles commandés</h6>
+                            {% for ligneCommande in commande.ligneCommandes %}
+                                <div class="d-flex align-items-center mb-3">
+                                    {% if ligneCommande.livre.image %}
+                                        <img src="{{ asset('uploads/books/' ~ ligneCommande.livre.image) }}" 
+                                             alt="{{ ligneCommande.livre.titre }}" 
+                                             style="width: 50px; height: 60px; object-fit: cover; border-radius: 4px;"
+                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                        <div style="width: 50px; height: 60px; background: var(--gray-light); border-radius: 4px; display: none; align-items: center; justify-content: center;">
+                                            <i class="bi bi-book" style="color: var(--gray); font-size: 1rem;"></i>
+                                        </div>
+                                    {% else %}
+                                        <div style="width: 50px; height: 60px; background: var(--gray-light); border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="bi bi-book" style="color: var(--gray); font-size: 1rem;"></i>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <div class="ms-3 flex-grow-1">
+                                        <div class="fw-semibold">{{ ligneCommande.livre.titre|u.truncate(40) }}</div>
+                                        <small class="text-muted">Quantité: {{ ligneCommande.quantity }}</small>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="fw-bold">{{ ligneCommande.getFormattedTotal() }}</div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="border-start ps-3">
+                                <h6 class="fw-semibold mb-3">Récapitulatif</h6>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Sous-total:</span>
+                                    <span>{{ commande.getFormattedTotal() }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Frais de livraison:</span>
+                                    <span>{{ commande.getFormattedShippingCost() }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span class="fw-semibold">Total:</span>
+                                    <span class="fw-bold text-library">{{ commande.getGrandTotal() }}</span>
+                                </div>
+                                
+                                {% if commande.status == 'delivered' %}
+                                    <button class="btn btn-outline-library btn-sm w-100" onclick="window.location.href='{{ path('books') }}'">
+                                        <i class="bi bi-book"></i> Commander à nouveau
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Informations de livraison si expédiée -->
+                    {% if commande.status == 'shipped' or commande.status == 'delivered' %}
+                        <div class="mt-3 pt-3 border-top">
+                            <div class="alert alert-info mb-0">
+                                <i class="bi bi-truck me-2"></i>
+                                <strong>Suivi de livraison:</strong> 
+                                Votre commande a été expédiée. Vous devriez la recevoir dans les 2-3 jours ouvrables.
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+<style>
+.progress-bar {
+    transition: width 0.3s ease;
+}
+
+.badge {
+    font-weight: 500;
+}
+
+.library-card {
+    transition: transform 0.2s ease;
+}
+
+.library-card:hover {
+    transform: translateY(-2px);
+}
+</style>
+{% endblock %}

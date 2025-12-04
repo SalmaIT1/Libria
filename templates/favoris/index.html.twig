@@ -1,0 +1,78 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}My Favorites - Libria{% endblock %}
+
+{% block body %}
+<div class="hero-section">
+    <div class="container text-center position-relative" style="z-index: 2;">
+        <h1 class="hero-title">My Favorites</h1>
+        <p class="hero-subtitle">Your saved books</p>
+    </div>
+</div>
+
+<div class="container my-5" style="position: relative; z-index: 1;">
+    {% if favoris is empty %}
+        <div class="library-card p-5 text-center">
+            <i class="bi bi-heart" style="font-size: 4rem; color: var(--almond);"></i>
+            <h4 class="book-title mt-3">No Favorites Yet</h4>
+            <p class="book-meta">Start adding books to your favorites!</p>
+            <a href="{{ path('books') }}" class="btn btn-library mt-3">
+                <i class="bi bi-book"></i> Browse Books
+            </a>
+        </div>
+    {% else %}
+        <div class="row g-4">
+            {% for favori in favoris %}
+                <div class="col-md-4 col-lg-3">
+                    <div class="library-card book-modern-card h-100">
+                        <a href="{{ path('book_show', {id: favori.livre.id}) }}" class="text-decoration-none">
+                            {% if favori.livre.image %}
+                                <img src="{{ asset('uploads/books/' ~ favori.livre.image) }}" 
+                                     alt="{{ favori.livre.titre }}" 
+                                     class="book-cover" 
+                                     style="object-fit:cover;width:100%;height:180px;">
+                            {% else %}
+                                <div class="book-cover" style="height: 180px;display:flex;align-items:center;justify-content:center;font-size:2.8rem;background:var(--vanilla);color:var(--caramel);">
+                                    <i class="bi bi-book"></i>
+                                </div>
+                            {% endif %}
+                        </a>
+                        <div class="p-3">
+                            <h6 class="mt-2 mb-1 book-title">{{ favori.livre.titre }}</h6>
+                            <small class="text-muted d-block mb-2">
+                                <i class="bi bi-calendar"></i> Added {{ favori.dateAjout|date('M d, Y') }}
+                            </small>
+                            <div class="d-flex gap-2">
+                                <a href="{{ path('book_show', {id: favori.livre.id}) }}" class="btn btn-outline-secondary btn-sm flex-fill">
+                                    <i class="bi bi-eye"></i> View
+                                </a>
+                                <button class="btn btn-outline-danger btn-sm toggle-favorite" data-book-id="{{ favori.livre.id }}">
+                                    <i class="bi bi-heart-fill"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+<script>
+document.querySelectorAll('.toggle-favorite').forEach(btn => {
+    btn.addEventListener('click', async function(e) {
+        e.preventDefault();
+        const bookId = this.dataset.bookId;
+        const response = await fetch(`/favoris/toggle/${bookId}`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'}
+        });
+        const data = await response.json();
+        if (data.added === false) {
+            location.reload();
+        }
+    });
+});
+</script>
+{% endblock %}
+

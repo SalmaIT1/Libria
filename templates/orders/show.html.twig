@@ -1,0 +1,585 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Order {{ commande.reference }} - Libria{% endblock %}
+
+{% block body %}
+<div class="container mt-4 mb-5">
+    <!-- Premium Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="premium-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="premium-title">
+                            <i class="bi bi-box-seam me-3"></i>Order {{ commande.reference }}
+                            <span class="premium-badge bg-{{ commande.getStatusColor() }}">
+                                {{ commande.getStatusLabel() }}
+                            </span>
+                        </h1>
+                        <p class="premium-subtitle">Placed on {{ commande.createdAt|date('F d, Y H:i') }}</p>
+                    </div>
+                    <a href="{{ path('orders') }}" class="btn btn-premium-outline">
+                        <i class="bi bi-arrow-left me-2"></i>Back to Orders
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Order Information Premium -->
+            <div class="info-card-premium mb-4">
+                <div class="card-header-premium">
+                    <h5 class="mb-0">
+                        <i class="bi bi-info-circle me-2"></i>Order Information
+                    </h5>
+                </div>
+                <div class="card-body-premium">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="info-item-premium">
+                                <label class="info-label-premium">Order Date</label>
+                                <div class="info-value-premium">
+                                    <i class="bi bi-calendar3 me-2"></i>{{ commande.createdAt|date('F d, Y H:i') }}
+                                </div>
+                            </div>
+                            <div class="info-item-premium">
+                                <label class="info-label-premium">Payment Method</label>
+                                <div class="info-value-premium">
+                                    {% if commande.paymentMethod == 'credit_card' %}
+                                        <i class="bi bi-credit-card me-2"></i>Credit Card
+                                    {% elseif commande.paymentMethod == 'debit_card' %}
+                                        <i class="bi bi-credit-card me-2"></i>Debit Card
+                                    {% elseif commande.paymentMethod == 'paypal' %}
+                                        <i class="bi bi-paypal me-2"></i>PayPal
+                                    {% else %}
+                                        <i class="bi bi-bank me-2"></i>Bank Transfer
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% if commande.trackingNumber %}
+                                <div class="info-item-premium">
+                                    <label class="info-label-premium">Tracking Number</label>
+                                    <div class="info-value-premium">
+                                        <i class="bi bi-truck me-2"></i><code>{{ commande.trackingNumber }}</code>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            {% if commande.paidAt %}
+                                <div class="info-item-premium">
+                                    <label class="info-label-premium">Payment Date</label>
+                                    <div class="info-value-premium">
+                                        <i class="bi bi-check-circle me-2"></i>{{ commande.paidAt|date('F d, Y H:i') }}
+                                    </div>
+                                </div>
+                            {% endif %}
+                            {% if commande.shippedAt %}
+                                <div class="info-item-premium">
+                                    <label class="info-label-premium">Shipping Date</label>
+                                    <div class="info-value-premium">
+                                        <i class="bi bi-truck me-2"></i>{{ commande.shippedAt|date('F d, Y H:i') }}
+                                    </div>
+                                </div>
+                            {% endif %}
+                            {% if commande.deliveredAt %}
+                                <div class="info-item-premium">
+                                    <label class="info-label-premium">Delivery Date</label>
+                                    <div class="info-value-premium">
+                                        <i class="bi bi-house-check me-2"></i>{{ commande.deliveredAt|date('F d, Y H:i') }}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if commande.notes %}
+                        <div class="info-item-premium mt-3">
+                            <label class="info-label-premium">Order Notes</label>
+                            <div class="info-value-premium">
+                                <i class="bi bi-chat-text me-2"></i>{{ commande.notes }}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Order Items Premium -->
+            <div class="info-card-premium">
+                <div class="card-header-premium">
+                    <h5 class="mb-0">
+                        <i class="bi bi-book me-2"></i>Order Items ({{ commande.ligneCommandes|length }})
+                    </h5>
+                </div>
+                <div class="card-body-premium p-0">
+                    <div class="table-responsive">
+                        <table class="table table-premium">
+                            <thead>
+                                <tr>
+                                    <th>Book</th>
+                                    <th>Price</th>
+                                    <th>Quantity</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ligneCommande in commande.ligneCommandes %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                {% if ligneCommande.livre.image %}
+                                                    <img src="{{ asset('uploads/books/' ~ ligneCommande.livre.image) }}" 
+                                                         alt="{{ ligneCommande.livre.titre }}" 
+                                                         class="me-3 book-cover-premium">
+                                                {% else %}
+                                                    <div class="book-cover-placeholder me-3">
+                                                        <i class="bi bi-book"></i>
+                                                    </div>
+                                                {% endif %}
+                                                <div>
+                                                    <h6 class="mb-1 book-title-premium">{{ ligneCommande.livre.titre }}</h6>
+                                                    <small class="text-muted">
+                                                        {% for auteur in ligneCommande.livre.auteurs %}
+                                                            {{ auteur }}{% if not loop.last %}, {% endif %}
+                                                        {% endfor %}
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="price-cell-premium">{{ ligneCommande.getFormattedPrice() }}</td>
+                                        <td class="quantity-cell-premium">{{ ligneCommande.quantity }}</td>
+                                        <td class="total-cell-premium">{{ ligneCommande.getFormattedTotal() }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Order Summary Premium -->
+            <div class="info-card-premium mb-4">
+                <div class="card-header-premium">
+                    <h5 class="mb-0">
+                        <i class="bi bi-receipt me-2"></i>Order Summary
+                    </h5>
+                </div>
+                <div class="card-body-premium">
+                    <div class="price-breakdown-premium">
+                        <div class="price-row-premium">
+                            <span>Subtotal</span>
+                            <span>{{ commande.getFormattedTotal() }}</span>
+                        </div>
+                        <div class="price-row-premium">
+                            <span>Shipping</span>
+                            <span>{{ commande.getFormattedShippingCost() }}</span>
+                        </div>
+                        {% if commande.couponCode %}
+                            <div class="price-row-premium discount-row-premium">
+                                <span>
+                                    <i class="bi bi-tag me-1"></i>
+                                    Discount ({{ commande.couponCode }})
+                                </span>
+                                <span class="text-success">-{{ commande.getFormattedDiscountAmount() }}</span>
+                            </div>
+                        {% endif %}
+                        <hr class="price-divider-premium">
+                        <div class="price-total-premium">
+                            <span>Total</span>
+                            <span>{{ commande.getGrandTotal() }}</span>
+                        </div>
+                    </div>
+
+                    {% if commande.canBeCancelled() %}
+                        <div class="d-grid mb-3">
+                            <form method="post" 
+                                  action="{{ path('order_cancel', {'reference': commande.reference}) }}" 
+                                  onsubmit="return confirm('Are you sure you want to cancel this order? Stock will be restored.')">
+                                <button type="submit" class="btn btn-outline-danger w-100 btn-premium">
+                                    <i class="bi bi-x-circle me-2"></i>Cancel Order
+                                </button>
+                            </form>
+                        </div>
+                    {% endif %}
+
+                    {% if commande.status == 'paid' %}
+                        <div class="d-grid mb-3">
+                            <a href="{{ path('order_invoice', {'reference': commande.reference}) }}" 
+                               class="btn btn-premium w-100">
+                                <i class="bi bi-file-earmark-pdf me-2"></i>Download Invoice
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Order Timeline Premium -->
+            <div class="info-card-premium mb-4">
+                <div class="card-header-premium">
+                    <h5 class="mb-0">
+                        <i class="bi bi-clock-history me-2"></i>Order Timeline
+                    </h5>
+                </div>
+                <div class="card-body-premium">
+                    <div class="timeline-premium">
+                        <div class="timeline-item-premium completed">
+                            <div class="timeline-icon-premium">
+                                <i class="bi bi-check-circle-fill"></i>
+                            </div>
+                            <div class="timeline-content-premium">
+                                <small class="timeline-label-premium">Order Placed</small>
+                                <strong class="timeline-date-premium">{{ commande.createdAt|date('M d, Y H:i') }}</strong>
+                            </div>
+                        </div>
+                        {% if commande.paidAt %}
+                            <div class="timeline-item-premium completed">
+                                <div class="timeline-icon-premium">
+                                    <i class="bi bi-check-circle-fill"></i>
+                                </div>
+                                <div class="timeline-content-premium">
+                                    <small class="timeline-label-premium">Payment Confirmed</small>
+                                    <strong class="timeline-date-premium">{{ commande.paidAt|date('M d, Y H:i') }}</strong>
+                                </div>
+                            </div>
+                        {% endif %}
+                        {% if commande.shippedAt %}
+                            <div class="timeline-item-premium completed">
+                                <div class="timeline-icon-premium">
+                                    <i class="bi bi-truck"></i>
+                                </div>
+                                <div class="timeline-content-premium">
+                                    <small class="timeline-label-premium">Shipped</small>
+                                    <strong class="timeline-date-premium">{{ commande.shippedAt|date('M d, Y H:i') }}</strong>
+                                </div>
+                            </div>
+                        {% endif %}
+                        {% if commande.deliveredAt %}
+                            <div class="timeline-item-premium completed">
+                                <div class="timeline-icon-premium">
+                                    <i class="bi bi-house-check-fill"></i>
+                                </div>
+                                <div class="timeline-content-premium">
+                                    <small class="timeline-label-premium">Delivered</small>
+                                    <strong class="timeline-date-premium">{{ commande.deliveredAt|date('M d, Y H:i') }}</strong>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Addresses Premium -->
+            <div class="info-card-premium mb-4">
+                <div class="card-header-premium">
+                    <h5 class="mb-0">
+                        <i class="bi bi-geo-alt me-2"></i>Shipping Information
+                    </h5>
+                </div>
+                <div class="card-body-premium">
+                    <div class="address-premium">
+                        <h6 class="address-title-premium">
+                            <i class="bi bi-house me-2"></i>Shipping Address
+                        </h6>
+                        <p class="address-text-premium">{{ commande.shippingAddress }}</p>
+                    </div>
+                    
+                    {% if commande.billingAddress and commande.billingAddress != commande.shippingAddress %}
+                        <div class="address-premium mt-4">
+                            <h6 class="address-title-premium">
+                                <i class="bi bi-credit-card me-2"></i>Billing Address
+                            </h6>
+                            <p class="address-text-premium">{{ commande.billingAddress }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Premium Order Page Styles */
+.premium-header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    border-radius: 16px;
+    padding: 2rem;
+    color: white;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.premium-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.premium-badge {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    backdrop-filter: blur(10px);
+}
+
+.premium-subtitle {
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0;
+    font-size: 1rem;
+}
+
+.info-card-premium {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.info-card-premium:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.card-header-premium {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.card-header-premium h5 {
+    color: var(--dark);
+    font-weight: 600;
+}
+
+.card-body-premium {
+    padding: 1.5rem;
+}
+
+.info-item-premium {
+    margin-bottom: 1.5rem;
+}
+
+.info-label-premium {
+    color: var(--gray);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+}
+
+.info-value-premium {
+    color: var(--dark);
+    font-weight: 500;
+    font-size: 1rem;
+}
+
+.book-cover-premium {
+    width: 60px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.book-cover-placeholder {
+    width: 60px;
+    height: 80px;
+    background: var(--gray-light);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gray);
+    font-size: 1.5rem;
+}
+
+.book-title-premium {
+    color: var(--dark);
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.table-premium {
+    margin-bottom: 0;
+}
+
+.table-premium thead th {
+    background: var(--gray-light);
+    border: none;
+    color: var(--dark);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    letter-spacing: 0.5px;
+}
+
+.table-premium tbody td {
+    vertical-align: middle;
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 1.5rem;
+}
+
+.table-premium tbody tr:hover {
+    background: rgba(var(--primary-rgb), 0.05);
+}
+
+.price-cell-premium, .quantity-cell-premium, .total-cell-premium {
+    font-weight: 600;
+    color: var(--dark);
+}
+
+.price-breakdown-premium {
+    margin-bottom: 1.5rem;
+}
+
+.price-row-premium {
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+}
+
+.price-row-premium span:first-child {
+    color: var(--gray);
+}
+
+.price-row-premium span:last-child {
+    font-weight: 500;
+    color: var(--dark);
+}
+
+.discount-row-premium span:last-child {
+    color: var(--success) !important;
+}
+
+.price-divider-premium {
+    border: none;
+    border-top: 2px solid var(--border-color);
+    margin: 1rem 0;
+}
+
+.price-total-premium {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.timeline-premium {
+    position: relative;
+}
+
+.timeline-item-premium {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.timeline-item-premium:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: 40px;
+    width: 2px;
+    height: calc(100% + 10px);
+    background: var(--border-color);
+}
+
+.timeline-icon-premium {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    flex-shrink: 0;
+}
+
+.timeline-item-premium.completed .timeline-icon-premium {
+    background: var(--success);
+    color: white;
+}
+
+.timeline-content-premium {
+    flex: 1;
+}
+
+.timeline-label-premium {
+    color: var(--gray);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.timeline-date-premium {
+    color: var(--dark);
+    font-size: 0.95rem;
+}
+
+.address-premium {
+    margin-bottom: 1rem;
+}
+
+.address-title-premium {
+    color: var(--dark);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.address-text-premium {
+    color: var(--gray);
+    margin-bottom: 0;
+    line-height: 1.6;
+}
+
+.btn-premium {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(var(--primary-rgb), 0.3);
+}
+
+.btn-premium:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(var(--primary-rgb), 0.4);
+    color: white;
+}
+
+.btn-premium-outline {
+    background: transparent;
+    color: var(--primary);
+    border: 2px solid var(--primary);
+    border-radius: 12px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-premium-outline:hover {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-2px);
+}
+</style>
+{% endblock %}

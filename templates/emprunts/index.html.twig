@@ -1,0 +1,119 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}My Borrowings - Libria{% endblock %}
+
+{% block body %}
+<div class="hero-section">
+    <div class="container text-center position-relative" style="z-index: 2;">
+        <h1 class="hero-title">My Borrowings</h1>
+        <p class="hero-subtitle">Manage your borrowed books</p>
+    </div>
+</div>
+
+<div class="container my-5" style="position: relative; z-index: 1;">
+    <!-- Emprunts en cours -->
+    <div class="mb-5">
+        <h3 class="book-title mb-4">
+            <i class="bi bi-clock-history"></i> Current Borrowings ({{ empruntsEnCours|length }})
+        </h3>
+        {% if empruntsEnCours is empty %}
+            <div class="library-card p-4 text-center">
+                <p class="book-meta">No current borrowings</p>
+            </div>
+        {% else %}
+            <div class="row g-4">
+                {% for emprunt in empruntsEnCours %}
+                    <div class="col-md-6">
+                        <div class="library-card p-4 {% if emprunt.estEnRetard() %}border-danger border-2{% endif %}">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="flex-fill">
+                                    <h5 class="book-title mb-2">
+                                        <a href="{{ path('book_show', {id: emprunt.livre.id}) }}" class="text-decoration-none">
+                                            {{ emprunt.livre.titre }}
+                                        </a>
+                                    </h5>
+                                    <p class="book-meta mb-1">
+                                        <i class="bi bi-calendar-check"></i> Borrowed: {{ emprunt.dateEmprunt|date('F d, Y') }}
+                                    </p>
+                                    <p class="book-meta mb-1">
+                                        <i class="bi bi-calendar-x"></i> Due: {{ emprunt.dateRetourPrevu|date('F d, Y') }}
+                                    </p>
+                                    {% if emprunt.estEnRetard() %}
+                                        <span class="badge bg-danger">
+                                            <i class="bi bi-exclamation-triangle"></i> Overdue
+                                        </span>
+                                    {% else %}
+                                        {% set joursRestants = (emprunt.dateRetourPrevu.timestamp - 'now'|date('U')) / 86400 %}
+                                        {% if joursRestants <= 7 %}
+                                            <span class="badge bg-warning">
+                                                <i class="bi bi-clock"></i> Due soon ({{ joursRestants|round }} days)
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-success">
+                                                <i class="bi bi-check-circle"></i> {{ joursRestants|round }} days remaining
+                                            </span>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <form method="POST" action="{{ path('emprunt_return', {id: emprunt.id}) }}">
+                                <button type="submit" class="btn btn-library btn-sm">
+                                    <i class="bi bi-arrow-return-left"></i> Return Book
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Emprunts retournés -->
+    {% if empruntsRetournes is not empty %}
+        <div>
+            <h3 class="book-title mb-4">
+                <i class="bi bi-check-circle"></i> Returned Books
+            </h3>
+            <div class="row g-4">
+                {% for emprunt in empruntsRetournes %}
+                    <div class="col-md-6">
+                        <div class="library-card p-4">
+                            <h5 class="book-title mb-2">
+                                <a href="{{ path('book_show', {id: emprunt.livre.id}) }}" class="text-decoration-none">
+                                    {{ emprunt.livre.titre }}
+                                </a>
+                            </h5>
+                            <p class="book-meta mb-1">
+                                <i class="bi bi-calendar-check"></i> Borrowed: {{ emprunt.dateEmprunt|date('F d, Y') }}
+                            </p>
+                            <p class="book-meta mb-0">
+                                <i class="bi bi-calendar-check-fill"></i> Returned: {{ emprunt.dateRetourEffectif|date('F d, Y') }}
+                            </p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Return book confirmation using shared modal
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('form button[type="submit"]')) {
+                e.preventDefault();
+                const form = e.target.closest('form');
+                showSharedConfirmModal(
+                    'Are you sure you want to return this book?',
+                    () => form.submit(),
+                    'Confirm Return'
+                );
+            }
+        });
+    </script>
+{% endblock %}
+

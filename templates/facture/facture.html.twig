@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Facture {{ facture.numero }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            line-height: 1.4;
+            color: #333;
+        }
+        
+        .header {
+            border-bottom: 2px solid #333;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .company-info {
+            margin-top: 10px;
+            font-size: 11px;
+        }
+        
+        .invoice-info {
+            text-align: right;
+            margin-top: 20px;
+        }
+        
+        .invoice-number {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .section {
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+        }
+        
+        .customer-info, .billing-info {
+            margin-bottom: 20px;
+        }
+        
+        table.items {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        table.items th {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        table.items td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        
+        table.items td.quantity, table.items td.price, table.items td.total {
+            text-align: right;
+        }
+        
+        .totals {
+            text-align: right;
+            margin-top: 20px;
+        }
+        
+        .totals table {
+            width: 300px;
+            border-collapse: collapse;
+            margin-left: auto;
+        }
+        
+        .totals td {
+            padding: 5px;
+            border: none;
+        }
+        
+        .totals .total-row {
+            font-weight: bold;
+            border-top: 2px solid #333;
+        }
+        
+        .footer {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            font-size: 11px;
+            color: #666;
+        }
+        
+        .status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        
+        .status.paid {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status.pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">LIBRIA - Librairie en Ligne</div>
+        <div class="company-info">
+            123, Avenue Habib Bourguiba<br>
+            Tunis, 1000 Tunisie<br>
+            Tél: +216 71 123 456<br>
+            Email: contact@libria.tn<br>
+            MF: 12345678/A/M/000
+        </div>
+        
+        <div class="invoice-info">
+            <div class="invoice-number">FACTURE N° {{ facture.numero }}</div>
+            <div>Date: {{ facture.createdAt|date('d/m/Y') }}</div>
+            <div class="status {% if commande.status in ['paid', 'processing', 'shipped', 'delivered'] %}paid{% else %}pending{% endif %}">
+                {% if commande.status in ['paid', 'processing', 'shipped', 'delivered'] %}PAYÉE{% else %}EN ATTENTE DE PAIEMENT{% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Informations Client</div>
+        <div class="customer-info">
+            <strong>{{ commande.user.firstName }} {{ commande.user.lastName }}</strong><br>
+            {{ commande.user.email }}<br>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Adresse de Facturation</div>
+        <div class="billing-info">
+            {{ commande.billingAddress|nl2br }}
+        </div>
+        
+        {% if commande.shippingAddress %}
+        <div class="section-title">Adresse de Livraison</div>
+        <div class="billing-info">
+            {{ commande.shippingAddress|nl2br }}
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="section">
+        <div class="section-title">Détails de la Commande</div>
+        <table class="items">
+            <thead>
+                <tr>
+                    <th>Article</th>
+                    <th>Quantité</th>
+                    <th>Prix Unitaire</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ligne in commande.ligneCommandes %}
+                <tr>
+                    <td>
+                        <strong>{{ ligne.livre.titre }}</strong><br>
+                        <small>
+                            {% for auteur in ligne.livre.auteurs %}
+                                {{ auteur }}{% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                        </small><br>
+                        <small>ISBN: {{ ligne.livre.isbn }}</small>
+                    </td>
+                    <td class="quantity">{{ ligne.quantity }}</td>
+                    <td class="price">{{ ligne.getFormattedPrice() }}</td>
+                    <td class="total">{{ ligne.getFormattedTotal() }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="totals">
+        <table>
+            <tr>
+                <td>Total HT:</td>
+                <td align="right">{{ facture.getFormattedMontantHT() }}</td>
+            </tr>
+            <tr>
+                <td>TVA (19%):</td>
+                <td align="right">{{ facture.getFormattedMontantTVA() }}</td>
+            </tr>
+            {% if commande.shippingCost %}
+            <tr>
+                <td>Frais de livraison:</td>
+                <td align="right">{{ commande.getFormattedShippingCost() }}</td>
+            </tr>
+            {% endif %}
+            <tr class="total-row">
+                <td>Total TTC:</td>
+                <td align="right">{{ facture.getFormattedMontantTTC() }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Informations de Paiement</div>
+        <p>
+            <strong>Méthode de paiement:</strong> 
+            {% if commande.paymentMethod == 'credit_card' %}Carte de Crédit{% endif %}
+            {% if commande.paymentMethod == 'debit_card' %}Carte de Débit{% endif %}
+            {% if commande.paymentMethod == 'paypal' %}PayPal{% endif %}
+            {% if commande.paymentMethod == 'bank_transfer' %}Virement Bancaire{% endif %}
+            <br>
+            <strong>Référence commande:</strong> {{ commande.reference }}
+            {% if commande.trackingNumber %}
+            <br>
+            <strong>Numéro de suivi:</strong> {{ commande.trackingNumber }}
+            {% endif %}
+        </p>
+    </div>
+
+    <div class="footer">
+        <div style="display: flex; justify-content: space-between;">
+            <div>
+                <strong>Mentions légales:</strong><br>
+                En vertu de l'article 27 de la loi n° 2000-82 du 9 août 2000 relative aux échanges électroniques,<br>
+                la présente facture est conservée sur support numérique pendant une durée de dix ans.
+            </div>
+            <div style="text-align: right;">
+                <strong>LIBRIA</strong><br>
+                Société de commerce de livres<br>
+                www.libria.tn
+            </div>
+        </div>
+    </div>
+</body>
+</html>

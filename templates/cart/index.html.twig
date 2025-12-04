@@ -1,0 +1,1227 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Shopping Cart - Libria{% endblock %}
+
+{% block body %}
+<div class="container mt-4 mb-5">
+    <!-- Premium Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="premium-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="premium-title">
+                            <i class="bi bi-cart3 me-3"></i>Shopping Cart
+                            <span class="premium-badge">{{ panier.lignePaniers|length }}</span>
+                        </h1>
+                        <p class="premium-subtitle">{{ panier.lignePaniers|length }} items ready for checkout</p>
+                    </div>
+                    <a href="{{ path('books') }}" class="btn btn-premium-outline">
+                        <i class="bi bi-arrow-left me-2"></i>Continue Shopping
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if panier.isEmpty() %}
+        <!-- Empty Cart Premium -->
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="empty-cart-premium">
+                    <div class="text-center p-5">
+                        <div class="empty-icon-wrapper">
+                            <i class="bi bi-cart-x"></i>
+                        </div>
+                        <h3 class="mt-4">Your cart is empty</h3>
+                        <p class="text-muted mb-4">Discover amazing books and add them to your cart</p>
+                        <a href="{{ path('books') }}" class="btn btn-premium">
+                            <i class="bi bi-book me-2"></i>Browse Books
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="row">
+            <!-- Cart Items Premium -->
+            <div class="col-lg-8">
+                <div class="cart-premium">
+                    <div class="cart-header-premium">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="bi bi-bag-check me-2"></i>
+                                Cart Items
+                            </h5>
+                            <span class="item-count">{{ panier.lignePaniers|length }} items</span>
+                        </div>
+                    </div>
+                    <div class="cart-body-premium">
+                        {% for lignePanier in panier.lignePaniers %}
+                            <div class="cart-item-premium" data-ligne-id="{{ lignePanier.id }}">
+                                <div class="row align-items-center">
+                                    <!-- Product Image -->
+                                    <div class="col-md-2">
+                                        <div class="product-image-premium">
+                                            {% if lignePanier.livre.image %}
+                                                <img src="{{ asset('uploads/books/' ~ lignePanier.livre.image) }}" 
+                                                     alt="{{ lignePanier.livre.titre }}" 
+                                                     class="img-fluid"
+                                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                            {% endif %}
+                                            <div class="image-placeholder-premium" {% if lignePanier.livre.image %}style="display: none;"{% endif %}>
+                                                <i class="bi bi-book"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Product Info -->
+                                    <div class="col-md-4">
+                                        <div class="product-info-premium">
+                                            <h6 class="product-title-premium">{{ lignePanier.livre.titre }}</h6>
+                                            <p class="product-authors-premium">
+                                                {% for auteur in lignePanier.livre.auteurs %}
+                                                    {{ auteur.nom }}{% if not loop.last %}, {% endif %}
+                                                {% endfor %}
+                                            </p>
+                                            <div class="product-price-premium">{{ lignePanier.getFormattedPrice() }}</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Quantity -->
+                                    <div class="col-md-3">
+                                        <div class="quantity-premium">
+                                            <label class="quantity-label">Quantity</label>
+                                            <div class="quantity-group">
+                                                <button class="quantity-btn-premium decrease" 
+                                                        data-ligne-id="{{ lignePanier.id }}" 
+                                                        data-action="decrease">
+                                                    <i class="bi bi-dash"></i>
+                                                </button>
+                                                <input type="number" 
+                                                       class="quantity-input-premium" 
+                                                       value="{{ lignePanier.quantity }}" 
+                                                       min="1" 
+                                                       max="{{ lignePanier.livre.nbExemplaires }}"
+                                                       data-ligne-id="{{ lignePanier.id }}">
+                                                <button class="quantity-btn-premium increase" 
+                                                        data-ligne-id="{{ lignePanier.id }}" 
+                                                        data-action="increase">
+                                                    <i class="bi bi-plus"></i>
+                                                </button>
+                                            </div>
+                                            <small class="stock-info">{{ lignePanier.livre.nbExemplaires }} available</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Total & Actions -->
+                                    <div class="col-md-3 text-end">
+                                        <div class="item-actions-premium">
+                                            <div class="item-total-premium">
+                                                <span class="total-label-premium">Total</span>
+                                                <div class="total-price-premium">{{ lignePanier.getFormattedTotal() }}</div>
+                                            </div>
+                                            <button class="btn-remove-premium" 
+                                                    data-ligne-id="{{ lignePanier.id }}">
+                                                <i class="bi bi-trash"></i> Remove
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        
+                        <!-- Cart Actions Premium -->
+                        <div class="cart-actions-premium">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <button class="btn-clear-premium">
+                                        <i class="bi bi-trash me-2"></i>Clear Cart
+                                    </button>
+                                </div>
+                                <div class="col-md-6 text-end">
+                                    <a href="{{ path('checkout') }}" class="btn-checkout-premium">
+                                        <i class="bi bi-credit-card me-2"></i>Proceed to Checkout
+                                        <i class="bi bi-arrow-right ms-2"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Summary Premium -->
+            <div class="col-lg-4">
+                <div class="summary-premium">
+                    <div class="summary-header-premium">
+                        <h5 class="mb-0">
+                            <i class="bi bi-receipt-cutoff me-2"></i>
+                            Order Summary
+                        </h5>
+                    </div>
+                    <div class="summary-body-premium">
+                        <!-- Items Count -->
+                        <div class="summary-item">
+                            <span>Items</span>
+                            <span class="summary-value">{{ panier.lignePaniers|length }}</span>
+                        </div>
+                        
+                        <!-- Coupon Section -->
+                        <div class="coupon-section mb-4">
+                            <div class="coupon-header">
+                                <h6 class="mb-3">
+                                    <i class="bi bi-ticket-perforated me-2"></i>
+                                    Promo Code
+                                </h6>
+                            </div>
+                            <div class="coupon-input-group">
+                                <div class="input-group">
+                                    <input type="text" 
+                                           class="form-control coupon-input" 
+                                           id="couponCode"
+                                           placeholder="Enter promo code"
+                                           maxlength="20">
+                                    <button class="btn btn-primary apply-coupon-btn" type="button">
+                                        <i class="bi bi-check-circle me-1"></i>Apply
+                                    </button>
+                                </div>
+                                <div class="coupon-feedback mt-2">
+                                    <small class="text-muted">Enter a valid promo code for discount</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Price Details -->
+                        <div class="price-details-premium">
+                            <div class="price-row">
+                                <span>Subtotal</span>
+                                <span class="cart-total">{{ panier.getFormattedTotalAmount() }}</span>
+                            </div>
+                            <div class="price-row">
+                                <span>Shipping</span>
+                                <span>8.00 TND</span>
+                            </div>
+                            <div class="price-row discount-row">
+                                <span>
+                                    <i class="bi bi-tag me-1"></i>
+                                    Discount
+                                </span>
+                                <span class="discount-value">-0.00 TND</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Total -->
+                        <div class="total-premium">
+                            <div class="total-row">
+                                <span>Total</span>
+                                <span class="grand-total-premium">{{ (panier.getTotalAmount() + 8.00)|number_format(2, '.', ' ') }} TND</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Checkout Button -->
+                        <a href="{{ path('checkout') }}" class="btn-checkout-summary">
+                            <i class="bi bi-credit-card me-2"></i>Proceed to Checkout
+                        </a>
+                        
+                        <!-- Shipping Info -->
+                        <div class="shipping-premium">
+                            <h6 class="shipping-title">
+                                <i class="bi bi-truck me-2"></i>
+                                Shipping Information
+                            </h6>
+                            <ul class="shipping-list">
+                                <li>
+                                    <i class="bi bi-clock"></i>
+                                    <span>Standard delivery: 3-5 business days</span>
+                                </li>
+                                <li>
+                                    <i class="bi bi-geo-alt"></i>
+                                    <span>Tracking number provided</span>
+                                </li>
+                                <li>
+                                    <i class="bi bi-shield-check"></i>
+                                    <span>Secure payment processing</span>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Security Badge -->
+                        <div class="security-premium">
+                            <i class="bi bi-shield-check me-2"></i>
+                            <span>Secure SSL Encrypted Checkout</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+/* Site-Coherent Color Palette - Using existing CSS variables */
+.premium-header {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    padding: 2.5rem;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.premium-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.premium-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0;
+    position: relative;
+    z-index: 1;
+    color: var(--text-primary);
+}
+
+.premium-badge {
+    background: var(--primary);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-left: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.premium-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin: 0.5rem 0 0 0;
+    position: relative;
+    z-index: 1;
+    color: var(--text-primary);
+}
+
+.btn-premium {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.75rem 2rem;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px -1px rgba(139, 69, 19, 0.3);
+}
+
+.btn-premium:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(139, 69, 19, 0.3);
+}
+
+.btn-premium-outline {
+    background: transparent;
+    color: var(--text-primary);
+    border: 2px solid var(--text-primary);
+    padding: 0.75rem 2rem;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-premium-outline:hover {
+    background: var(--text-primary);
+    color: var(--bg-primary);
+    transform: translateY(-2px);
+}
+
+/* Empty Cart */
+.empty-cart-premium {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border-color);
+}
+
+.empty-icon-wrapper {
+    width: 120px;
+    height: 120px;
+    background: var(--almond);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 2rem;
+    font-size: 3rem;
+    color: var(--gray);
+}
+
+/* Cart */
+.cart-premium {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+}
+
+.cart-header-premium {
+    background: var(--primary);
+    color: white;
+    padding: 1.5rem 2rem;
+    border: none;
+}
+
+.item-count {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.cart-body-premium {
+    padding: 2rem;
+}
+
+/* Cart Item */
+.cart-item-premium {
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    background: var(--almond);
+    border: 1px solid var(--border-color-light);
+    transition: all 0.3s ease;
+}
+
+.cart-item-premium:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary);
+}
+
+.product-image-premium img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.image-placeholder-premium {
+    width: 100%;
+    height: 100px;
+    background: linear-gradient(135deg, var(--almond), var(--vanilla));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: var(--gray);
+}
+
+.product-info-premium {
+    padding: 0 1rem;
+}
+
+.product-title-premium {
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+    line-height: 1.3;
+}
+
+.product-authors-premium {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+}
+
+.product-price-premium {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+/* Quantity */
+.quantity-premium {
+    text-align: center;
+}
+
+.quantity-label {
+    font-weight: 600;
+    color: var(--text-primary);
+    display: block;
+    margin-bottom: 0.75rem;
+}
+
+.quantity-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 140px;
+    margin: 0 auto;
+}
+
+.quantity-btn-premium {
+    background: var(--primary);
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.quantity-btn-premium:first-child {
+    border-radius: 8px 0 0 8px;
+}
+
+.quantity-btn-premium:last-child {
+    border-radius: 0 8px 8px 0;
+}
+
+.quantity-btn-premium:hover {
+    background: var(--primary-dark);
+    transform: scale(1.1);
+}
+
+.quantity-input-premium {
+    border: 2px solid var(--primary);
+    border-left: none;
+    border-right: none;
+    text-align: center;
+    font-weight: 700;
+    height: 40px;
+    width: 60px;
+    background: white;
+    color: var(--text-primary);
+}
+
+.quantity-input-premium:focus {
+    outline: none;
+    border-color: var(--primary-dark);
+}
+
+.stock-info {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+}
+
+/* Item Actions */
+.item-actions-premium {
+    text-align: right;
+}
+
+.item-total-premium {
+    margin-bottom: 1rem;
+}
+
+.total-label-premium {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.total-price-premium {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--primary);
+}
+
+.btn-remove-premium {
+    background: transparent;
+    color: var(--danger);
+    border: 2px solid var(--danger);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-remove-premium:hover {
+    background: var(--danger);
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* Cart Actions */
+.cart-actions-premium {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 2px solid var(--border-color);
+}
+
+.btn-clear-premium {
+    background: transparent;
+    color: var(--danger);
+    border: 2px solid var(--danger);
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-clear-premium:hover {
+    background: var(--danger);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.btn-checkout-premium {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.75rem 2rem;
+    border-radius: 12px;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px -1px rgba(139, 69, 19, 0.3);
+}
+
+.btn-checkout-premium:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(139, 69, 19, 0.3);
+}
+
+/* Summary */
+.summary-premium {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+}
+
+.summary-header-premium {
+    background: var(--success);
+    color: white;
+    padding: 1.5rem 2rem;
+    border: none;
+}
+
+.summary-body-premium {
+    padding: 2rem;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.summary-value {
+    background: var(--almond);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+/* Coupon Section */
+.coupon-section {
+    background: linear-gradient(135deg, var(--almond), var(--vanilla));
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 2px dashed var(--primary);
+    margin-bottom: 1.5rem;
+}
+
+.coupon-header h6 {
+    color: var(--text-primary);
+    font-weight: 700;
+    margin: 0;
+}
+
+.coupon-input {
+    border: 2px solid var(--border-color);
+    border-radius: 8px 0 0 8px;
+    padding: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.coupon-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 0.2rem rgba(139, 69, 19, 0.25);
+}
+
+.apply-coupon-btn {
+    background: var(--primary);
+    border: none;
+    border-radius: 0 8px 8px 0;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.apply-coupon-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+}
+
+.coupon-feedback {
+    min-height: 20px;
+}
+
+.coupon-feedback.success {
+    color: var(--success);
+    font-weight: 600;
+}
+
+.coupon-feedback.error {
+    color: var(--danger);
+    font-weight: 600;
+}
+
+.coupon-feedback.info {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.coupon-applied {
+    background: var(--success);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.coupon-applied .coupon-info {
+    font-weight: 600;
+}
+
+.coupon-applied .remove-coupon {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+}
+
+.coupon-applied .remove-coupon:hover {
+    opacity: 1;
+}
+
+.price-details-premium {
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 0;
+    margin: 1rem 0;
+}
+
+.price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    color: var(--text-primary);
+}
+
+.discount-row {
+    color: var(--success);
+}
+
+.discount-value {
+    font-weight: 700;
+}
+
+.total-premium {
+    background: linear-gradient(135deg, var(--primary-light), var(--primary));
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin: 1rem 0;
+    box-shadow: 0 4px 6px -1px rgba(139, 69, 19, 0.2);
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+}
+
+.grand-total-premium {
+    font-size: 1.75rem;
+    font-weight: 800;
+}
+
+.btn-checkout-summary {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 1rem;
+    border-radius: 12px;
+    font-weight: 700;
+    width: 100%;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px -1px rgba(139, 69, 19, 0.3);
+}
+
+.btn-checkout-summary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(139, 69, 19, 0.3);
+}
+
+/* Shipping */
+.shipping-premium {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.shipping-title {
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.shipping-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.shipping-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.shipping-list i {
+    color: var(--primary);
+    width: 20px;
+}
+
+.security-premium {
+    background: var(--success);
+    color: white;
+    padding: 1rem;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: 600;
+    margin-top: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .premium-title {
+        font-size: 2rem;
+    }
+    
+    .premium-header {
+        padding: 2rem 1.5rem;
+    }
+    
+    .cart-item-premium .row {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .cart-item-premium .col-md-3 {
+        text-align: left !important;
+    }
+    
+    .cart-actions-premium .row {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .cart-actions-premium .text-end {
+        text-align: center !important;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Coupon functionality
+    const couponInput = document.getElementById('couponCode');
+    const applyCouponBtn = document.querySelector('.apply-coupon-btn');
+    const couponFeedback = document.querySelector('.coupon-feedback');
+    
+    let currentCoupon = null;
+    
+    applyCouponBtn?.addEventListener('click', applyCoupon);
+    couponInput?.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            applyCoupon();
+        }
+    });
+    
+    async function applyCoupon() {
+        const code = couponInput.value.trim().toUpperCase();
+        
+        if (!code) {
+            showCouponFeedback('Please enter a promo code', 'error');
+            return;
+        }
+        
+        // Show loading state
+        applyCouponBtn.disabled = true;
+        applyCouponBtn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>Validating...';
+        
+        try {
+            const response = await fetch('/cart/apply-coupon', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `code=${code}`
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                currentCoupon = data.coupon;
+                
+                // Apply discount
+                updateTotalsWithDiscount(data.discount);
+                
+                // Show applied coupon UI
+                showCouponApplied(data.coupon);
+                
+                // Show success message
+                showCouponFeedback(data.message, 'success');
+                
+                // Disable input
+                couponInput.disabled = true;
+                applyCouponBtn.innerHTML = '<i class="bi bi-check-circle me-1"></i>Applied';
+            } else {
+                showCouponFeedback(data.message, 'error');
+                couponInput.value = '';
+                
+                // Reset button
+                applyCouponBtn.disabled = false;
+                applyCouponBtn.innerHTML = '<i class="bi bi-check-circle me-1"></i>Apply';
+            }
+        } catch (error) {
+            console.error('Error validating coupon:', error);
+            showCouponFeedback('Error validating promo code', 'error');
+            
+            // Reset button
+            applyCouponBtn.disabled = false;
+            applyCouponBtn.innerHTML = '<i class="bi bi-check-circle me-1"></i>Apply';
+        }
+    }
+    
+    function removeCoupon() {
+        currentCoupon = null;
+        
+        fetch('/cart/remove-coupon', {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Reset totals
+                updateTotalsWithDiscount(0);
+                
+                // Remove applied coupon UI
+                const appliedCoupon = document.querySelector('.coupon-applied');
+                if (appliedCoupon) {
+                    appliedCoupon.remove();
+                }
+                
+                // Enable input
+                couponInput.disabled = false;
+                applyCouponBtn.disabled = false;
+                applyCouponBtn.innerHTML = '<i class="bi bi-check-circle me-1"></i>Apply';
+                couponInput.value = '';
+                
+                showCouponFeedback('Promo code removed', 'info');
+            } else {
+                showCouponFeedback(data.message || 'Error removing promo code', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error removing coupon:', error);
+            showCouponFeedback('Error removing promo code', 'error');
+        });
+    }
+    
+    function updateTotalsWithDiscount(discount = 0) {
+        const cartTotalElement = document.querySelector('.cart-total');
+        const discountElement = document.querySelector('.discount-value');
+        const grandTotalElements = document.querySelectorAll('.grand-total-premium');
+        
+        if (!cartTotalElement) return;
+        
+        const cartTotalText = cartTotalElement.textContent;
+        const cartTotal = parseFloat(cartTotalText.replace(' TND', '').replace(' ', ''));
+        const shippingCost = 8.00;
+        
+        const finalTotal = cartTotal + shippingCost - discount;
+        
+        // Update discount display
+        if (discountElement) {
+            discountElement.textContent = `-${discount.toFixed(2)} TND`;
+        }
+        
+        // Update grand total
+        grandTotalElements.forEach(el => {
+            el.textContent = finalTotal.toFixed(2).replace('.', ',') + ' TND';
+        });
+    }
+    
+    function showCouponFeedback(message, type) {
+        couponFeedback.className = `coupon-feedback mt-2 ${type}`;
+        couponFeedback.innerHTML = `<small>${message}</small>`;
+        
+        // Auto-hide success messages after 3 seconds
+        if (type === 'success') {
+            setTimeout(() => {
+                couponFeedback.className = 'coupon-feedback mt-2';
+                couponFeedback.innerHTML = '<small class="text-muted">Enter a valid promo code for discount</small>';
+            }, 3000);
+        }
+    }
+    
+    function showCouponApplied(coupon) {
+        const couponSection = document.querySelector('.coupon-section');
+        
+        const appliedCouponHtml = `
+            <div class="coupon-applied">
+                <div class="coupon-info">
+                    <i class="bi bi-ticket-perforated-fill me-2"></i>
+                    ${coupon.code} - ${coupon.description || coupon.formattedValue}
+                </div>
+                <button class="remove-coupon" onclick="removeCoupon()">
+                    <i class="bi bi-x-circle"></i>
+                </button>
+            </div>
+        `;
+        
+        couponSection.insertAdjacentHTML('beforeend', appliedCouponHtml);
+    }
+    
+    // Initialize totals on page load
+    updateTotalsWithDiscount();
+
+    // Update quantity
+    document.querySelectorAll('.quantity-btn-premium').forEach(button => {
+        button.addEventListener('click', function() {
+            const ligneId = this.dataset.ligneId;
+            const action = this.dataset.action;
+            const input = document.querySelector(`input[data-ligne-id="${ligneId}"]`);
+            let quantity = parseInt(input.value);
+            const maxStock = parseInt(input.max);
+            
+            if (action === 'increase' && quantity < maxStock) {
+                quantity++;
+            } else if (action === 'decrease' && quantity > 1) {
+                quantity--;
+            } else {
+                return;
+            }
+            
+            updateQuantity(ligneId, quantity);
+        });
+    });
+
+    // Handle direct input change
+    document.querySelectorAll('.quantity-input-premium').forEach(input => {
+        input.addEventListener('change', function() {
+            const ligneId = this.dataset.ligneId;
+            const quantity = parseInt(this.value);
+            const maxStock = parseInt(this.max);
+            
+            if (quantity >= 1 && quantity <= maxStock) {
+                updateQuantity(ligneId, quantity);
+            } else {
+                this.value = Math.max(1, Math.min(maxStock, quantity));
+            }
+        });
+    });
+
+    // Remove item
+    document.querySelectorAll('.btn-remove-premium').forEach(button => {
+        button.addEventListener('click', function() {
+            const ligneId = this.dataset.ligneId;
+            if (confirm('Remove this item from cart?')) {
+                removeItem(ligneId);
+            }
+        });
+    });
+
+    // Clear cart
+    document.querySelector('.btn-clear-premium')?.addEventListener('click', function() {
+        if (confirm('Clear entire cart?')) {
+            clearCart();
+        }
+    });
+
+    function updateQuantity(ligneId, quantity) {
+        fetch(`/cart/update/${ligneId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `quantity=${quantity}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update input
+                const input = document.querySelector(`input[data-ligne-id="${ligneId}"]`);
+                input.value = quantity;
+                
+                // Update cart count
+                updateCartCount();
+                
+                // Update item total
+                const itemTotal = document.querySelector(`div[data-ligne-id="${ligneId}"] .total-price-premium`);
+                if (itemTotal) {
+                    itemTotal.textContent = data.itemTotal;
+                }
+                
+                // Update totals
+                document.querySelectorAll('.cart-total').forEach(el => {
+                    el.textContent = data.cartTotal;
+                });
+                
+                // Update totals with discount
+                updateTotalsWithDiscount();
+                
+                showNotification('Quantity updated', 'success');
+            } else {
+                showNotification(data.error || 'Error updating quantity', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Error updating quantity', 'error');
+        });
+    }
+
+    function removeItem(ligneId) {
+        fetch(`/cart/remove/${ligneId}`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update cart count
+                updateCartCount();
+                
+                // Remove item with animation
+                const item = document.querySelector(`div[data-ligne-id="${ligneId}"]`);
+                if (item) {
+                    item.style.opacity = '0';
+                    item.style.transform = 'translateX(-20px)';
+                    setTimeout(() => item.remove(), 300);
+                }
+                
+                // Update totals
+                document.querySelectorAll('.cart-total').forEach(el => {
+                    el.textContent = data.cartTotal;
+                });
+                
+                // Update totals with discount
+                updateTotalsWithDiscount();
+                
+                // Reload if cart empty
+                if (data.cartCount === 0) {
+                    setTimeout(() => location.reload(), 500);
+                }
+                
+                showNotification('Item removed', 'success');
+            } else {
+                showNotification(data.error || 'Error removing item', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Error removing item', 'error');
+        });
+    }
+
+    function clearCart() {
+        fetch('/cart/clear', {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                updateCartCount();
+                showNotification('Cart cleared', 'success');
+                setTimeout(() => location.reload(), 500);
+            } else {
+                showNotification(data.error || 'Error clearing cart', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Error clearing cart', 'error');
+        });
+    }
+
+    function showNotification(message, type) {
+        const notification = document.createElement('div');
+        notification.className = `alert alert-${type === 'error' ? 'danger' : type} position-fixed top-0 end-0 m-3`;
+        notification.style.zIndex = '9999';
+        notification.style.minWidth = '250px';
+        notification.style.borderRadius = '12px';
+        notification.style.border = 'none';
+        notification.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.1)';
+        
+        if (type === 'success') {
+            notification.style.background = 'var(--success)';
+            notification.style.color = 'white';
+        } else if (type === 'error') {
+            notification.style.background = 'var(--danger)';
+            notification.style.color = 'white';
+        }
+        
+        notification.innerHTML = `
+            <div class="d-flex align-items-center">
+                <i class="bi bi-${type === 'error' ? 'x-circle' : type === 'success' ? 'check-circle' : 'info-circle'} me-2"></i>
+                <strong>${message}</strong>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            notification.style.transform = 'translateX(20px)';
+            setTimeout(() => {
+                if (document.body.contains(notification)) {
+                    document.body.removeChild(notification);
+                }
+            }, 300);
+        }, 3000);
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,518 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}My Dashboard - Libria{% endblock %}
+
+{% block body %}
+<div class="hero-section">
+    <div class="container text-center position-relative" style="z-index: 2;">
+        <h1 class="hero-title">My Dashboard</h1>
+        <p class="hero-subtitle">Your reading statistics and recommendations</p>
+    </div>
+</div>
+
+<div class="container mb-5" style="position: relative; z-index: 1;">
+    <!-- Statistics Cards -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card stat-card-favorites">
+                <div class="stat-icon">
+                    <i class="bi bi-heart-fill"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-number">{{ nombreFavoris }}</h3>
+                    <p class="stat-label">Favorites</p>
+                    <a href="{{ path('favoris') }}" class="stat-link">View All <i class="bi bi-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card stat-card-borrowings">
+                <div class="stat-icon">
+                    <i class="bi bi-book"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-number">{{ nombreEmprunts }}</h3>
+                    <p class="stat-label">Total Borrowings</p>
+                    <a href="{{ path('emprunts') }}" class="stat-link">View All <i class="bi bi-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card stat-card-current">
+                <div class="stat-icon">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-number">{{ nombreEmpruntsEnCours }}</h3>
+                    <p class="stat-label">Current Borrowings</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card stat-card-orders">
+                <div class="stat-icon">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-number">{{ nombreCommandes }}</h3>
+                    <p class="stat-label">Orders</p>
+                    <a href="{{ path('user_orders') }}" class="stat-link">View All <i class="bi bi-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overdue Books Alert -->
+    {% if empruntsEnRetard is not empty %}
+        <div class="overdue-alert mb-5">
+            <div class="overdue-content">
+                <div class="overdue-icon">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                </div>
+                <div class="overdue-text">
+                    <h5>Overdue Books</h5>
+                    <p>You have {{ empruntsEnRetard|length }} overdue book(s). Please return them as soon as possible.</p>
+                </div>
+                <a href="{{ path('emprunts') }}" class="btn btn-warning">View Borrowings</a>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Recommendations -->
+    {% if recommandations is not empty %}
+        <div class="section-modern mb-5">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="bi bi-stars"></i> Recommended for You
+                </h2>
+                <p class="section-subtitle">Based on your reading preferences</p>
+            </div>
+            <div class="row g-4">
+                {% for livre in recommandations %}
+                    <div class="col-md-4 col-lg-3 col-sm-6">
+                        <div class="book-card">
+                            <a href="{{ path('book_show', {id: livre.id}) }}" class="book-card-link">
+                                {% if livre.image %}
+                                    <img src="{{ asset('uploads/books/' ~ livre.image) }}" 
+                                         alt="{{ livre.titre }}" 
+                                         class="book-card-image">
+                                {% else %}
+                                    <div class="book-card-placeholder">
+                                        <i class="bi bi-book"></i>
+                                    </div>
+                                {% endif %}
+                            </a>
+                            <div class="book-card-content">
+                                <h6 class="book-card-title">{{ livre.titre }}</h6>
+                                {% if livre.editeur %}
+                                    <p class="book-card-meta">
+                                        <i class="bi bi-building"></i> {{ livre.editeur.nomEditeur }}
+                                    </p>
+                                {% endif %}
+                                <a href="{{ path('book_show', {id: livre.id}) }}" class="book-card-btn">
+                                    View Details <i class="bi bi-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Popular Books -->
+    {% if livresPopulaires is not empty %}
+        <div class="section-modern">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="bi bi-fire"></i> Most Popular Books
+                </h2>
+                <p class="section-subtitle">Trending in the library</p>
+            </div>
+            <div class="row g-4">
+                {% for result in livresPopulaires %}
+                    {% set livre = result.livre %}
+                    <div class="col-md-4 col-lg-3 col-sm-6">
+                        <div class="book-card">
+                            <a href="{{ path('book_show', {id: livre.id}) }}" class="book-card-link">
+                                {% if livre.image %}
+                                    <img src="{{ asset('uploads/books/' ~ livre.image) }}" 
+                                         alt="{{ livre.titre }}" 
+                                         class="book-card-image">
+                                {% else %}
+                                    <div class="book-card-placeholder">
+                                        <i class="bi bi-book"></i>
+                                    </div>
+                                {% endif %}
+                            </a>
+                            <div class="book-card-content">
+                                <h6 class="book-card-title">{{ livre.titre }}</h6>
+                                <p class="book-card-meta">
+                                    <i class="bi bi-people"></i> {{ result.nbEmprunts }} borrowings
+                                </p>
+                                <a href="{{ path('book_show', {id: livre.id}) }}" class="book-card-btn">
+                                    View Details <i class="bi bi-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    /* Statistics Cards */
+    .stat-card {
+        background: var(--bg-card);
+        backdrop-filter: blur(10px);
+        border-radius: 1.5rem;
+        padding: 2rem 1.5rem;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        height: 100%;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+    }
+
+    .stat-card-favorites::before {
+        background: linear-gradient(90deg, #ff6b9d, #ff8fab);
+    }
+
+    .stat-card-borrowings::before {
+        background: linear-gradient(90deg, var(--mocca), var(--caramel));
+    }
+
+    .stat-card-current::before {
+        background: linear-gradient(90deg, var(--coffee), var(--mocca));
+    }
+
+    .stat-card-reviews::before {
+        background: linear-gradient(90deg, var(--almond), var(--caramel));
+    }
+
+    .stat-card-orders::before {
+        background: linear-gradient(90deg, var(--library), var(--caramel));
+    }
+
+    .stat-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 40px rgba(171, 119, 67, 0.15);
+    }
+
+    .stat-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+        font-size: 1.75rem;
+        transition: all 0.3s ease;
+    }
+
+    .stat-card-favorites .stat-icon {
+        background: linear-gradient(135deg, #ff6b9d, #ff8fab);
+        color: white;
+    }
+
+    .stat-card-borrowings .stat-icon {
+        background: linear-gradient(135deg, var(--mocca), var(--caramel));
+        color: white;
+    }
+
+    .stat-card-current .stat-icon {
+        background: linear-gradient(135deg, var(--coffee), var(--mocca));
+        color: white;
+    }
+
+    .stat-card-reviews .stat-icon {
+        background: linear-gradient(135deg, var(--almond), var(--caramel));
+        color: white;
+    }
+
+    .stat-card-orders .stat-icon {
+        background: linear-gradient(135deg, var(--library), var(--caramel));
+        color: white;
+    }
+
+    .stat-card:hover .stat-icon {
+        transform: scale(1.1) rotate(5deg);
+    }
+
+    .stat-number {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        line-height: 1;
+    }
+
+    .stat-label {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        margin-bottom: 1rem;
+        font-weight: 500;
+    }
+
+    .stat-link {
+        color: var(--caramel);
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .stat-link:hover {
+        color: var(--mocca);
+        gap: 0.75rem;
+    }
+
+    .stat-link i {
+        transition: transform 0.3s ease;
+    }
+
+    .stat-link:hover i {
+        transform: translateX(4px);
+    }
+
+    /* Overdue Alert */
+    .overdue-alert {
+        background: linear-gradient(135deg, #fff3cd, #ffe69c);
+        border: 2px solid #ffc107;
+        border-radius: 1.5rem;
+        padding: 1.5rem;
+        box-shadow: 0 8px 24px rgba(255, 193, 7, 0.2);
+    }
+
+    [data-theme='dark'] .overdue-alert {
+        background: linear-gradient(135deg, rgba(255, 193, 7, 0.2), rgba(255, 193, 7, 0.1));
+        border-color: #ffc107;
+    }
+
+    .overdue-content {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    .overdue-icon {
+        width: 60px;
+        height: 60px;
+        background: #ffc107;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+        color: white;
+        flex-shrink: 0;
+    }
+
+    .overdue-text {
+        flex: 1;
+    }
+
+    .overdue-text h5 {
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+
+    .overdue-text p {
+        color: var(--text-secondary);
+        margin-bottom: 0;
+    }
+
+    /* Section Modern */
+    .section-modern {
+        margin-bottom: 3rem;
+    }
+
+    .section-header {
+        margin-bottom: 2rem;
+    }
+
+    .section-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 2rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .section-title i {
+        color: var(--caramel);
+        font-size: 1.75rem;
+    }
+
+    .section-subtitle {
+        color: var(--text-secondary);
+        font-size: 1rem;
+        margin-bottom: 0;
+    }
+
+    /* Book Cards */
+    .book-card {
+        background: var(--bg-card);
+        backdrop-filter: blur(10px);
+        border-radius: 1.5rem;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .book-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 40px rgba(171, 119, 67, 0.15);
+        border-color: var(--caramel);
+    }
+
+    .book-card-link {
+        display: block;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .book-card-image {
+        width: 100%;
+        height: 220px;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .book-card:hover .book-card-image {
+        transform: scale(1.05);
+    }
+
+    .book-card-placeholder {
+        width: 100%;
+        height: 220px;
+        background: linear-gradient(135deg, var(--vanilla), var(--caramel));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: white;
+    }
+
+    .book-card-content {
+        padding: 1.5rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .book-card-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.75rem;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .book-card-meta {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .book-card-meta i {
+        color: var(--caramel);
+        font-size: 0.85rem;
+    }
+
+    .book-card-btn {
+        color: var(--caramel);
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        margin-top: auto;
+    }
+
+    .book-card-btn:hover {
+        color: var(--mocca);
+        gap: 0.75rem;
+    }
+
+    .book-card-btn i {
+        transition: transform 0.3s ease;
+    }
+
+    .book-card-btn:hover i {
+        transform: translateX(4px);
+    }
+
+    /* Dark Theme */
+    [data-theme='dark'] .stat-card {
+        background: rgba(30, 30, 30, 0.95);
+        border-color: rgba(215, 189, 166, 0.2);
+    }
+
+    [data-theme='dark'] .book-card {
+        background: rgba(30, 30, 30, 0.95);
+        border-color: rgba(215, 189, 166, 0.2);
+    }
+
+    [data-theme='dark'] .book-card:hover {
+        border-color: var(--vanilla);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .stat-number {
+            font-size: 2rem;
+        }
+
+        .overdue-content {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .section-title {
+            font-size: 1.75rem;
+        }
+    }
+</style>
+{% endblock %}

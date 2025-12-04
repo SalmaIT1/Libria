@@ -1,0 +1,102 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Notifications - Libria{% endblock %}
+
+{% block body %}
+<div class="hero-section">
+    <div class="container text-center position-relative" style="z-index: 2;">
+        <h1 class="hero-title">Notifications</h1>
+        <p class="hero-subtitle">Stay updated with your library activity</p>
+    </div>
+</div>
+
+<div class="container my-5" style="position: relative; z-index: 1;">
+    {% if notifications is empty %}
+        <div class="library-card p-5 text-center">
+            <i class="bi bi-bell" style="font-size: 4rem; color: var(--almond);"></i>
+            <h4 class="book-title mt-3">No Notifications</h4>
+            <p class="book-meta">You're all caught up!</p>
+        </div>
+    {% else %}
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <p class="book-meta mb-0">
+                <strong>{{ nonLues }}</strong> unread notification(s)
+            </p>
+            {% if nonLues > 0 %}
+                <button class="btn btn-sm btn-outline-secondary" id="markAllRead">
+                    <i class="bi bi-check-all"></i> Mark All as Read
+                </button>
+            {% endif %}
+        </div>
+
+        <div class="list-group">
+            {% for notification in notifications %}
+                <div class="library-card p-4 mb-3 {% if not notification.lu %}border-start border-3 border-primary{% endif %}">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-fill">
+                            <h5 class="book-title mb-2">
+                                {% if notification.type == 'success' %}
+                                    <i class="bi bi-check-circle text-success"></i>
+                                {% elseif notification.type == 'warning' %}
+                                    <i class="bi bi-exclamation-triangle text-warning"></i>
+                                {% elseif notification.type == 'info' %}
+                                    <i class="bi bi-info-circle text-info"></i>
+                                {% elseif notification.type == 'emprunt' %}
+                                    <i class="bi bi-book text-primary"></i>
+                                {% elseif notification.type == 'nouveau_livre' %}
+                                    <i class="bi bi-book-fill text-primary"></i>
+                                {% else %}
+                                    <i class="bi bi-bell text-secondary"></i>
+                                {% endif %}
+                                {{ notification.titre }}
+                            </h5>
+                            <p class="book-meta mb-2">{{ notification.message }}</p>
+                            <small class="text-muted">
+                                <i class="bi bi-clock"></i> {{ notification.dateCreation|date('F d, Y H:i') }}
+                            </small>
+                            {% if notification.lien %}
+                                <div class="mt-2">
+                                    <a href="{{ notification.lien }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-arrow-right"></i> View
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                        {% if not notification.lu %}
+                            <button class="btn btn-sm btn-outline-secondary mark-read" data-notification-id="{{ notification.id }}">
+                                <i class="bi bi-check"></i>
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+<script>
+document.querySelectorAll('.mark-read').forEach(btn => {
+    btn.addEventListener('click', async function() {
+        const notificationId = this.dataset.notificationId;
+        const response = await fetch(`/notifications/marquer-lu/${notificationId}`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'}
+        });
+        if (response.ok) {
+            location.reload();
+        }
+    });
+});
+
+document.getElementById('markAllRead')?.addEventListener('click', async function() {
+    const response = await fetch('/notifications/marquer-toutes-lues', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'}
+    });
+    if (response.ok) {
+        location.reload();
+    }
+});
+</script>
+{% endblock %}
+

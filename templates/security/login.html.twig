@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Login - Libria{% endblock %}
+
+{% block body %}
+<div class="hero-section">
+    <div class="container text-center position-relative" style="z-index: 2;">
+        <h1 class="hero-title">Login to Libria</h1>
+        <p class="hero-subtitle">Access your library account</p>
+    </div>
+</div>
+
+<div class="container my-5" style="position: relative; z-index: 1;">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="library-card p-5">
+                {% if error %}
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle"></i> {{ error.messageKey|trans(error.messageData, 'security') }}
+                    </div>
+                {% endif %}
+
+                <form method="post">
+                    <div class="mb-3">
+                        <label for="inputEmail" class="form-label">
+                            <i class="bi bi-envelope"></i> Email
+                        </label>
+                        <input type="email" value="{{ last_username }}" name="_username" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
+                    </div>
+                    <div class="mb-3">
+                        <label for="inputPassword" class="form-label">
+                            <i class="bi bi-lock"></i> Password
+                        </label>
+                        <input type="password" name="_password" id="inputPassword" class="form-control" autocomplete="current-password" required>
+                    </div>
+
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                    <div class="d-grid">
+                        <button class="btn btn-library btn-lg" type="submit">
+                            <i class="bi bi-box-arrow-in-right"></i> Sign In
+                        </button>
+                    </div>
+                </form>
+
+                <div class="text-center mt-4">
+                    <p class="book-meta">Don't have an account? 
+                        <a href="{{ path('register') }}" class="text-decoration-none" style="color: var(--text-secondary); font-weight: bold;">
+                            Register here
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

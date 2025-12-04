@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>{% block title %}Libria - Library Management System{% endblock %}</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>📚</text></svg>">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <style>
+            :root {
+                /* Modern Minimal Reading App Color Palette */
+                --deep-blue: #2A3D66;
+                --slate: #1E2A47;
+                --muted-teal: #4C8C8A;
+                --soft-grey: #F7F7F7;
+                --paper-white: #FAFAFA;
+                --light-grey: #E8E8E8;
+                --highlight-orange: #F4A261;
+                --soft-yellow: #F6C453;
+                --dark-charcoal: #1A1A1A;
+                
+                /* Primary Colors */
+                --primary: var(--deep-blue);
+                --primary-dark: var(--slate);
+                --primary-light: #3A4D76;
+                --secondary: var(--muted-teal);
+                --accent: var(--highlight-orange);
+                --tertiary: var(--soft-yellow);
+                
+                /* UI Colors - Light Mode */
+                --success: #10b981;
+                --warning: #f59e0b;
+                --danger: #ef4444;
+                --dark: var(--dark-charcoal);
+                --light: var(--soft-grey);
+                --gray: #6b7280;
+                --gray-light: var(--light-grey);
+                --white: #ffffff;
+                
+                /* Background & Text - Light Mode */
+                --bg-primary: linear-gradient(135deg, #e8eaed 0%, #dfe1e5 25%, #d5d8dc 50%, #cfd3d8 75%, #c5c9ce 100%);
+                --bg-card: rgba(255, 255, 255, 0.95);
+                --bg-navbar: rgba(42, 61, 102, 0.95);
+                --bg-hero: linear-gradient(135deg, rgba(42, 61, 102, 0.95) 0%, rgba(30, 42, 71, 0.9) 50%, rgba(76, 140, 138, 0.85) 100%);
+                --text-primary: var(--dark-charcoal);
+                --text-secondary: #2c3e50;
+                --text-muted: #5a6c7d;
+                --border-color: rgba(42, 61, 102, 0.25);
+                
+                /* Shadows */
+                --shadow-sm: 0 1px 2px 0 rgba(42, 61, 102, 0.1);
+                --shadow: 0 4px 6px -1px rgba(42, 61, 102, 0.15), 0 2px 4px -1px rgba(42, 61, 102, 0.1);
+                --shadow-md: 0 10px 15px -3px rgba(42, 61, 102, 0.2), 0 4px 6px -2px rgba(42, 61, 102, 0.1);
+                --shadow-lg: 0 20px 25px -5px rgba(42, 61, 102, 0.25), 0 10px 10px -5px rgba(42, 61, 102, 0.15);
+                --shadow-xl: 0 25px 50px -12px rgba(42, 61, 102, 0.3);
+            }
+
+            [data-theme="dark"] {
+                /* Dark Mode Colors - Modern Minimal Reading Theme */
+                --bg-primary: linear-gradient(135deg, #1a1d23 0%, #1f2229 25%, #25282f 50%, #2a2d35 75%, #1f2229 100%);
+                --bg-card: rgba(31, 34, 41, 0.95);
+                --bg-navbar: rgba(26, 29, 35, 0.95);
+                --bg-hero: linear-gradient(135deg, rgba(42, 61, 102, 0.8) 0%, rgba(30, 42, 71, 0.75) 50%, rgba(76, 140, 138, 0.7) 100%);
+                --text-primary: #f8f9fa;
+                --text-secondary: #e9ecef;
+                --text-muted: #adb5bd;
+                --border-color: rgba(42, 61, 102, 0.3);
+                --dark: #f8f9fa;
+                --light: #2a2d35;
+                --gray: #adb5bd;
+                --gray-light: #495057;
+                
+                /* Dark mode specific colors */
+                --primary: #4a6fa5;
+                --primary-dark: #5a7fb5;
+                --primary-light: #3a5f95;
+                --secondary: #6ca6a4;
+                --accent: #f4a261;
+                
+                /* Shadows for dark mode */
+                --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+                --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+                --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+                --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.5);
+                --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            }
+
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                background: var(--bg-primary);
+                background-size: 400% 400%;
+                animation: gradientShift 20s ease infinite;
+                min-height: 100vh;
+                color: var(--text-primary);
+                line-height: 1.6;
+                position: relative;
+                transition: background 0.3s ease, color 0.3s ease;
+            }
+
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: 
+                    radial-gradient(circle at 20% 50%, rgba(215, 189, 166, 0.3) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 80%, rgba(171, 119, 67, 0.3) 0%, transparent 50%),
+                    radial-gradient(circle at 40% 20%, rgba(132, 89, 61, 0.2) 0%, transparent 50%);
+                pointer-events: none;
+                z-index: 0;
+            }
+
+            @keyframes gradientShift {
+                0% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+                100% { background-position: 0% 50%; }
+            }
+
+            /* Modern Navbar with Glassmorphism */
+            .navbar {
+                background: var(--bg-navbar) !important;
+                backdrop-filter: blur(20px) saturate(180%);
+                -webkit-backdrop-filter: blur(20px) saturate(180%);
+                border-bottom: 1px solid var(--border-color);
+                box-shadow: var(--shadow-md);
+                padding: 1rem 0;
+                transition: all 0.3s ease;
+                position: relative;
+                z-index: 1000;
+            }
+
+            .navbar-brand {
+                font-family: 'Playfair Display', serif;
+                font-size: 1.75rem;
+                font-weight: 700;
+                color: white !important;
+                transition: all 0.3s ease;
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            }
+
+            .navbar-brand:hover {
+                transform: scale(1.05);
+                filter: brightness(1.1);
+            }
+
+            .nav-link {
+                color: rgba(255, 255, 255, 0.95) !important;
+                font-weight: 500;
+                padding: 0.5rem 0.75rem !important;
+                border-radius: 0.5rem;
+                transition: all 0.3s ease;
+                position: relative;
+                margin: 0 0.15rem;
+                font-size: 0.95rem;
+            }
+
+            .nav-link::before {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 0;
+                height: 2px;
+                background: linear-gradient(90deg, var(--caramel), var(--coffee));
+                transition: width 0.3s ease;
+            }
+
+            .nav-link:hover::before {
+                width: 80%;
+            }
+
+            .nav-link:hover {
+                color: var(--espresso) !important;
+                background: rgba(215, 189, 166, 0.3);
+                transform: translateY(-2px);
+            }
+
+            .navbar-avatar {
+                width: 28px;
+                height: 28px;
+                border-radius: 50%;
+                object-fit: cover;
+                border: 2px solid rgba(255, 255, 255, 0.3);
+            }
+
+            .dropdown-menu {
+                background: var(--bg-card);
+                border: 1px solid var(--border-color);
+                box-shadow: var(--shadow-md);
+                border-radius: 0.75rem;
+                padding: 0.5rem;
+                margin-top: 0.5rem;
+            }
+
+            [data-theme='dark'] .dropdown-menu {
+                background: rgba(30, 30, 30, 0.98);
+                border-color: var(--border-color);
+            }
+
+            .dropdown-item {
+                color: var(--text-primary);
+                padding: 0.5rem 1rem;
+                border-radius: 0.5rem;
+                transition: all 0.2s ease;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .dropdown-item:hover {
+                background: rgba(215, 189, 166, 0.15);
+                color: var(--text-primary);
+            }
+
+            .dropdown-item i {
+                width: 18px;
+                text-align: center;
+            }
+
+            .dropdown-toggle::after {
+                margin-left: 0.5rem;
+            }
+
+            .notification-dropdown {
+                width: 350px;
+                max-height: 500px;
+                overflow-y: auto;
+                overflow-x: hidden;
+                padding: 0;
+                margin-top: 0.5rem !important;
+                scrollbar-width: thin;
+                scrollbar-color: rgba(171, 119, 67, 0.3) transparent;
+            }
+
+            .notification-dropdown::-webkit-scrollbar {
+                width: 4px;
+            }
+
+            .notification-dropdown::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            .notification-dropdown::-webkit-scrollbar-thumb {
+                background: rgba(171, 119, 67, 0.3);
+                border-radius: 2px;
+            }
+
+            .notification-dropdown::-webkit-scrollbar-thumb:hover {
+                background: rgba(171, 119, 67, 0.5);
+            }
+
+            [data-theme='dark'] .notification-dropdown {
+                scrollbar-color: rgba(215, 189, 166, 0.3) transparent;
+            }
+
+            [data-theme='dark'] .notification-dropdown::-webkit-scrollbar-thumb {
+                background: rgba(215, 189, 166, 0.3);
+            }
+
+            [data-theme='dark'] .notification-dropdown::-webkit-scrollbar-thumb:hover {
+                background: rgba(215, 189, 166, 0.5);
+            }
+
+            .notification-header {
+                padding: 0.75rem 1rem;
+                background: rgba(215, 189, 166, 0.1);
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .notification-header h6 {
+                margin: 0;
+                font-size: 0.95rem;
+                color: var(--text-primary);
+            }
+
+            .notification-item {
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .notification-item:last-child {
+                border-bottom: none;
+            }
+
+            .notification-item.notification-unread {
+                background: rgba(215, 189, 166, 0.05);
+            }
+
+            .notification-link {
+                padding: 0.75rem 1rem !important;
+                border-radius: 0;
+                transition: background 0.2s;
+            }
+
+            .notification-link:hover {
+                background: rgba(215, 189, 166, 0.15) !important;
+            }
+
+            .notification-link:active {
+                background: rgba(215, 189, 166, 0.2) !important;
+            }
+
+            #notifications-list {
+                max-height: 400px;
+                overflow-y: auto;
+                overflow-x: hidden;
+                scrollbar-width: thin;
+                scrollbar-color: rgba(171, 119, 67, 0.3) transparent;
+            }
+
+            #notifications-list::-webkit-scrollbar {
+                width: 4px;
+            }
+
+            #notifications-list::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            #notifications-list::-webkit-scrollbar-thumb {
+                background: rgba(171, 119, 67, 0.3);
+                border-radius: 2px;
+            }
+
+            #notifications-list::-webkit-scrollbar-thumb:hover {
+                background: rgba(171, 119, 67, 0.5);
+            }
+
+            [data-theme='dark'] #notifications-list {
+                scrollbar-color: rgba(215, 189, 166, 0.3) transparent;
+            }
+
+            [data-theme='dark'] #notifications-list::-webkit-scrollbar-thumb {
+                background: rgba(215, 189, 166, 0.3);
+            }
+
+            [data-theme='dark'] #notifications-list::-webkit-scrollbar-thumb:hover {
+                background: rgba(215, 189, 166, 0.5);
+            }
+
+            #notifications-loading {
+                min-height: 100px;
+            }
+
+            /* Modern Cards */
+            .library-card {
+                background: var(--bg-card);
+                backdrop-filter: blur(10px);
+                border-radius: 24px;
+                box-shadow: var(--shadow-lg);
+                transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                border: 1px solid var(--border-color);
+                overflow: hidden;
+                position: relative;
+                color: var(--text-primary);
+            }
+
+            .library-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 3px;
+                background: linear-gradient(90deg, var(--deep-blue), var(--muted-teal), var(--highlight-orange), var(--primary-light));
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .library-card:hover::before {
+                opacity: 1;
+            }
+
+            .library-card:hover {
+                transform: translateY(-8px) scale(1.02);
+                box-shadow: var(--shadow-xl);
+                border-color: var(--muted-teal);
+            }
+            
+            [data-theme="dark"] .library-card:hover {
+                background: rgba(42, 45, 51, 0.98);
+            }
+
+            /* Book Cover */
+            .book-cover {
+                width: 100%;
+                height: 300px;
+                object-fit: cover;
+                background: linear-gradient(135deg, #e8eaed 0%, var(--muted-teal) 50%, var(--deep-blue) 100%);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: var(--deep-blue);
+                font-size: 3rem;
+                border-radius: 12px 12px 0 0;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .book-cover::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(244, 162, 97, 0.3), transparent);
+                transition: left 0.5s ease;
+            }
+
+            .library-card:hover .book-cover::after {
+                left: 100%;
+            }
+
+            .library-card:hover .book-cover {
+                transform: scale(1.05);
+            }
+
+            /* Typography */
+            .book-title {
+                color: var(--text-primary);
+                font-weight: 600;
+                font-size: 1.1rem;
+                margin-bottom: 0.5rem;
+                line-height: 1.4;
+            }
+
+            .book-meta {
+                color: var(--text-muted);
+                font-size: 0.875rem;
+                font-weight: 400;
+            }
+
+            /* Modern Buttons */
+            .btn-library {
+                background: linear-gradient(135deg, var(--deep-blue) 0%, var(--slate) 50%, var(--muted-teal) 100%);
+                border: none;
+                color: var(--white);
+                font-weight: 600;
+                padding: 0.75rem 1.5rem;
+                border-radius: 0.5rem;
+                transition: all 0.3s ease;
+                box-shadow: var(--shadow);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .btn-library::before {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 0;
+                height: 0;
+                border-radius: 50%;
+                background: rgba(244, 162, 97, 0.3);
+                transform: translate(-50%, -50%);
+                transition: width 0.6s, height 0.6s;
+            }
+
+            .btn-library:hover::before {
+                width: 300px;
+                height: 300px;
+            }
+
+            .btn-library:hover {
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-lg);
+                color: var(--white);
+                background: linear-gradient(135deg, var(--primary-light) 0%, var(--deep-blue) 50%, var(--slate) 100%);
+            }
+
+            .btn-library:active {
+                transform: translateY(0);
+            }
+
+            /* Hero Section */
+            .hero-section {
+                background: var(--bg-hero);
+                backdrop-filter: blur(20px);
+                color: var(--white);
+                padding: 3rem 0;
+                margin-bottom: 3rem;
+                border-radius: 0 0 40px 40px;
+                box-shadow: var(--shadow-xl);
+                position: relative;
+                overflow: hidden;
+                transition: background 0.3s ease;
+            }
+
+            .hero-section::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                right: -50%;
+                width: 200%;
+                height: 200%;
+                background: radial-gradient(circle, rgba(215, 189, 166, 0.2) 0%, transparent 70%);
+                animation: rotate 20s linear infinite;
+            }
+
+            @keyframes rotate {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+
+            .hero-title {
+                font-family: 'Playfair Display', 'Georgia', serif;
+                font-style: italic;
+                font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+                font-weight: 400;
+                margin-bottom: 0.5rem;
+                text-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+                position: relative;
+                z-index: 1;
+                letter-spacing: 0.5px;
+                color: rgba(255, 255, 255, 0.98);
+            }
+
+            .hero-subtitle {
+                font-family: 'Inter', 'Segoe UI', sans-serif;
+                font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+                font-weight: 300;
+                opacity: 0.85;
+                position: relative;
+                z-index: 1;
+                letter-spacing: 0.3px;
+                text-transform: none;
+                color: rgba(255, 255, 255, 0.9);
+            }
+
+            /* Section Title */
+            .section-title {
+                color: var(--text-primary);
+                font-family: 'Playfair Display', serif;
+                font-weight: 700;
+                font-size: 2.5rem;
+                margin-bottom: 2rem;
+                padding-bottom: 1rem;
+                position: relative;
+                display: inline-block;
+            }
+
+            .section-title::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 60px;
+                height: 4px;
+                background: linear-gradient(90deg, var(--caramel), var(--coffee));
+                border-radius: 2px;
+            }
+
+            /* Footer */
+            footer {
+                background: var(--bg-hero) !important;
+                backdrop-filter: blur(10px);
+                margin-top: 5rem;
+                border-top: 1px solid var(--border-color);
+                position: relative;
+                z-index: 1;
+                transition: background 0.3s ease;
+            }
+            
+            /* Theme Toggle Button */
+            .theme-toggle {
+                background: rgba(255, 255, 255, 0.1);
+                border: 1px solid var(--border-color);
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: var(--text-primary);
+                transition: all 0.3s ease;
+                cursor: pointer;
+                margin-left: 0.5rem;
+            }
+            
+            .theme-toggle:hover {
+                background: rgba(255, 255, 255, 0.2);
+                transform: scale(1.1);
+            }
+            
+            [data-theme="dark"] .theme-toggle {
+                background: rgba(255, 255, 255, 0.1);
+            }
+            
+            [data-theme="dark"] .theme-toggle:hover {
+                background: rgba(255, 255, 255, 0.2);
+            }
+            
+            /* Dark mode specific adjustments */
+            [data-theme="dark"] .form-control,
+            [data-theme="dark"] .form-select {
+                background: rgba(40, 40, 40, 0.9);
+                border-color: var(--border-color);
+                color: var(--text-primary);
+            }
+            
+            [data-theme="dark"] .form-control:focus,
+            [data-theme="dark"] .form-select:focus {
+                background: rgba(50, 50, 50, 0.9);
+                border-color: var(--caramel);
+                color: var(--text-primary);
+            }
+            
+            [data-theme="dark"] .text-muted {
+                color: var(--text-muted) !important;
+            }
+            
+            [data-theme="dark"] .alert {
+                background: rgba(40, 40, 40, 0.95);
+                border-color: var(--border-color);
+                color: var(--text-primary);
+            }
+
+            /* Form Elements */
+            .form-control, .form-select {
+                border-radius: 0.75rem;
+                border: 2px solid var(--gray-light);
+                padding: 0.75rem 1rem;
+                transition: all 0.3s ease;
+                background: rgba(255, 255, 255, 0.95);
+            }
+
+            .form-control:focus, .form-select:focus {
+                border-color: var(--caramel);
+                box-shadow: 0 0 0 3px rgba(171, 119, 67, 0.15);
+                background: var(--white);
+            }
+
+            /* Alert */
+            .alert {
+                border-radius: 1rem;
+                border: none;
+                box-shadow: var(--shadow);
+            }
+
+            /* Badge */
+            .badge {
+                padding: 0.5rem 0.75rem;
+                border-radius: 0.5rem;
+                font-weight: 500;
+            }
+
+            /* Responsive */
+            @media (max-width: 768px) {
+                .hero-section {
+                    padding: 2.5rem 0;
+                }
+                
+                .hero-title {
+                    font-size: 1.75rem;
+                }
+                
+                .hero-subtitle {
+                    font-size: 0.95rem;
+                }
+            }
+
+            /* Loading Animation */
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .library-card {
+                animation: fadeInUp 0.6s ease-out;
+            }
+
+            .library-card:nth-child(1) { animation-delay: 0.1s; }
+            .library-card:nth-child(2) { animation-delay: 0.2s; }
+            .library-card:nth-child(3) { animation-delay: 0.3s; }
+            .library-card:nth-child(4) { animation-delay: 0.4s; }
+
+            /* Icon Colors */
+            .bi {
+                color: var(--text-primary);
+                transition: color 0.3s ease;
+            }
+            
+            /* Navbar icons - ensure visibility in both modes */
+            .navbar .bi {
+                color: rgba(255, 255, 255, 0.9) !important;
+            }
+            
+            .navbar .nav-link:hover .bi {
+                color: var(--coffee) !important;
+            }
+            
+            /* Light mode adjustments */
+            [data-theme="light"] .navbar .bi {
+                color: var(--coffee) !important;
+            }
+            
+            [data-theme="light"] .navbar .nav-link:hover .bi {
+                color: var(--espresso) !important;
+            }
+            
+            /* Alert icons */
+            .alert .bi {
+                color: inherit !important;
+            }
+            
+            /* Dropdown icons */
+            .dropdown-item .bi {
+                color: var(--text-primary) !important;
+                margin-right: 0.5rem;
+            }
+            
+            /* Button icons */
+            .btn .bi {
+                color: inherit !important;
+            }
+            
+            /* Cart and notification icons */
+            .cart-dropdown .bi,
+            .notification-dropdown .bi {
+                color: var(--text-primary) !important;
+            }
+            
+            .hero-section .bi {
+                color: var(--white);
+            }
+            
+            .text-muted .bi {
+                color: var(--text-muted);
+            }
+            
+            /* Bootstrap Color Overrides */
+            .btn-primary {
+                background: linear-gradient(135deg, var(--deep-blue) 0%, var(--slate) 50%, var(--primary-light) 100%);
+                border: none;
+                color: var(--white);
+            }
+            
+            .btn-primary:hover {
+                background: linear-gradient(135deg, var(--primary-light) 0%, var(--deep-blue) 50%, var(--slate) 100%);
+                color: var(--white);
+            }
+            
+            .btn-secondary {
+                background: linear-gradient(135deg, var(--muted-teal) 0%, var(--secondary) 100%);
+                border: none;
+                color: var(--white);
+            }
+            
+            .btn-secondary:hover {
+                background: linear-gradient(135deg, var(--secondary) 0%, var(--muted-teal) 100%);
+                color: var(--white);
+            }
+            
+            .btn-outline-primary {
+                border-color: var(--deep-blue);
+                color: var(--deep-blue);
+            }
+            
+            .btn-outline-primary:hover {
+                background: var(--deep-blue);
+                border-color: var(--deep-blue);
+                color: var(--white);
+            }
+            
+            .btn-outline-secondary {
+                border-color: var(--muted-teal);
+                color: var(--muted-teal);
+            }
+            
+            .btn-outline-secondary:hover {
+                background: var(--muted-teal);
+                border-color: var(--muted-teal);
+                color: var(--white);
+            }
+            
+            .alert-success {
+                background-color: rgba(16, 185, 129, 0.1);
+                border-color: rgba(16, 185, 129, 0.3);
+                color: #059669;
+            }
+            
+            .alert-danger {
+                background-color: rgba(239, 68, 68, 0.1);
+                border-color: rgba(239, 68, 68, 0.3);
+                color: #dc2626;
+            }
+            
+            .alert-warning {
+                background-color: rgba(245, 158, 11, 0.1);
+                border-color: rgba(245, 158, 11, 0.3);
+                color: #d97706;
+            }
+            
+            [data-theme="dark"] .alert-success {
+                background-color: rgba(16, 185, 129, 0.2);
+                border-color: rgba(16, 185, 129, 0.4);
+                color: #34d399;
+            }
+            
+            [data-theme="dark"] .alert-danger {
+                background-color: rgba(239, 68, 68, 0.2);
+                border-color: rgba(239, 68, 68, 0.4);
+                color: #f87171;
+            }
+            
+            [data-theme="dark"] .alert-warning {
+                background-color: rgba(245, 158, 11, 0.2);
+                border-color: rgba(245, 158, 11, 0.4);
+                color: #fbbf24;
+            }
+        </style>
+        {% block stylesheets %}
+        {% endblock %}
+
+        {% block javascripts %}
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        {% endblock %}
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container">
+                <a class="navbar-brand" href="{{ path('home') }}">
+                    <i class="bi bi-book"></i> Libria
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('home') }}">
+                                <i class="bi bi-house"></i> Home
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('books') }}">
+                                <i class="bi bi-bookshelf"></i> Books
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('authors') }}">
+                                <i class="bi bi-person-badge"></i> Authors
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('publishers') }}">
+                                <i class="bi bi-building"></i> Publishers
+                            </a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav">
+                        <li class="nav-item d-flex align-items-center me-2">
+                            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" type="button">
+                                <i class="bi bi-sun-fill" id="themeIcon"></i>
+                            </button>
+                        </li>
+                        {% if app.user and not is_granted('ROLE_ADMIN') %}
+                            <li class="nav-item">
+                                <a class="nav-link position-relative dropdown-toggle" href="#" id="cartDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Shopping Cart">
+                                    <i class="bi bi-cart3"></i>
+                                    <span class="badge bg-danger position-absolute top-0 start-100 translate-middle rounded-pill" id="cart-badge" style="display: none; font-size: 0.65rem; padding: 0.2em 0.4em;">0</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end cart-dropdown" aria-labelledby="cartDropdown" id="cart-dropdown-menu" style="min-width: 350px; max-height: 400px; overflow-y: auto;">
+                                    <li>
+                                        <div class="cart-header">
+                                            <h6 class="dropdown-header mb-0">
+                                                <i class="bi bi-cart3"></i> Shopping Cart
+                                                <span class="badge bg-primary ms-2" id="cart-count-badge">0</span>
+                                            </h6>
+                                        </div>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <div id="cart-loading" class="text-center p-4">
+                                            <div class="spinner-border text-primary spinner-border-sm" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                        </div>
+                                        <div id="cart-items">
+                                            <!-- Cart items will be loaded here -->
+                                        </div>
+                                        <div id="cart-empty" class="text-center p-4" style="display: none;">
+                                            <i class="bi bi-cart-x" style="font-size: 2rem; color: var(--almond);"></i>
+                                            <p class="book-meta mt-2 mb-0" style="font-size: 0.85rem;">Your cart is empty</p>
+                                        </div>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <div class="px-3 pb-2">
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span><strong>Total:</strong></span>
+                                                <span id="cart-total" class="fw-bold">0.00 TND</span>
+                                            </div>
+                                            <div class="d-grid gap-2">
+                                                <a href="{{ path('cart') }}" class="btn btn-library btn-sm">
+                                                    <i class="bi bi-cart"></i> View Cart
+                                                </a>
+                                                <a href="{{ path('checkout') }}" class="btn btn-success btn-sm">
+                                                    <i class="bi bi-credit-card"></i> Checkout
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+                        {% endif %}
+                        {% if app.user %}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link position-relative dropdown-toggle" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Notifications">
+                                    <i class="bi bi-bell"></i>
+                                    <span class="badge bg-danger position-absolute top-0 start-100 translate-middle rounded-pill" id="notification-badge" style="display: none; font-size: 0.65rem; padding: 0.2em 0.4em;">0</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end notification-dropdown" aria-labelledby="notificationDropdown" id="notification-dropdown-menu">
+                                    <li>
+                                        <div class="notification-header">
+                                            <h6 class="dropdown-header mb-0">
+                                                <i class="bi bi-bell"></i> Notifications
+                                                <span class="badge bg-danger ms-2" id="notification-count-badge">0</span>
+                                            </h6>
+                                        </div>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <div id="notifications-loading" class="text-center p-4">
+                                            <div class="spinner-border text-primary spinner-border-sm" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                        </div>
+                                        <div id="notifications-list">
+                                            <!-- Notifications will be loaded here -->
+                                        </div>
+                                        <div id="notifications-empty" class="text-center p-4" style="display: none;">
+                                            <i class="bi bi-bell-slash" style="font-size: 2rem; color: var(--almond);"></i>
+                                            <p class="book-meta mt-2 mb-0" style="font-size: 0.85rem;">No notifications</p>
+                                        </div>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <div class="text-center p-2">
+                                            <a href="{{ path('notifications') }}" class="btn btn-outline-primary btn-sm w-100">
+                                                <i class="bi bi-arrow-right"></i> View All Notifications
+                                            </a>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    {% if app.user.avatar %}
+                                        <img src="{{ asset('uploads/avatars/' ~ app.user.avatar) }}" 
+                                             alt="Profile" 
+                                             class="navbar-avatar me-2"
+                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+                                        <i class="bi bi-person-circle me-2" style="display: none;"></i>
+                                    {% else %}
+                                        <i class="bi bi-person-circle me-2"></i>
+                                    {% endif %}
+                                    <span class="d-none d-lg-inline">
+                                        {% if app.user.firstName or app.user.lastName %}
+                                            {{ app.user.firstName }} {{ app.user.lastName }}
+                                        {% else %}
+                                            Account
+                                        {% endif %}
+                                    </span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                    {% if not is_granted('ROLE_ADMIN') %}
+                                        <li><a class="dropdown-item" href="{{ path('user_dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                                        <li><a class="dropdown-item" href="{{ path('user_orders') }}"><i class="bi bi-box-seam"></i> My Orders</a></li>
+                                        <li><a class="dropdown-item" href="{{ path('favoris') }}"><i class="bi bi-heart"></i> My Favorites</a></li>
+                                        <li><a class="dropdown-item" href="{{ path('emprunts') }}"><i class="bi bi-book"></i> My Books</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                    {% endif %}
+                                    <li><a class="dropdown-item" href="{{ path('profile') }}"><i class="bi bi-person"></i> Profile Settings</a></li>
+                                    {% if is_granted('ROLE_ADMIN') %}
+                                        <li><a class="dropdown-item" href="{{ path('admin') }}"><i class="bi bi-gear"></i> Admin Panel</a></li>
+                                    {% endif %}
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item text-danger" href="{{ path('logout') }}"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+                                </ul>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('login') }}">
+                                    <i class="bi bi-box-arrow-in-right"></i> Login
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('register') }}">
+                                    <i class="bi bi-person-plus"></i> Register
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <main style="min-height: calc(100vh - 200px); position: relative; z-index: 1;">
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success alert-dismissible fade show m-3" role="alert" style="position: relative; z-index: 1001;">
+                    <i class="bi bi-check-circle"></i> {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+            {% for message in app.flashes('error') %}
+                <div class="alert alert-danger alert-dismissible fade show m-3" role="alert" style="position: relative; z-index: 1001;">
+                    <i class="bi bi-exclamation-triangle"></i> {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% block body %}{% endblock %}
+        </main>
+        
+        {% if app.user %}
+        <script>
+            // Initialize dropdown
+            document.addEventListener('DOMContentLoaded', function() {
+                const dropdownElement = document.getElementById('notificationDropdown');
+                const dropdownMenu = document.getElementById('notification-dropdown-menu');
+                
+                if (dropdownElement && dropdownMenu) {
+                    // Load notifications when dropdown is shown
+                    dropdownElement.addEventListener('show.bs.dropdown', function() {
+                        loadNotifications();
+                    });
+                }
+            });
+
+            // Load unread notification count
+            function updateNotificationBadge() {
+                fetch('/notifications/non-lues')
+                    .then(response => response.json())
+                    .then(data => {
+                        const badge = document.getElementById('notification-badge');
+                        const countBadge = document.getElementById('notification-count-badge');
+                        if (data.count > 0) {
+                            const count = data.count > 99 ? '99+' : data.count;
+                            if (badge) {
+                                badge.textContent = count;
+                                badge.style.display = 'block';
+                            }
+                            if (countBadge) {
+                                countBadge.textContent = count;
+                            }
+                        } else {
+                            if (badge) badge.style.display = 'none';
+                            if (countBadge) countBadge.textContent = '0';
+                        }
+                    });
+            }
+
+            // Load recent notifications
+            function loadNotifications() {
+                const loading = document.getElementById('notifications-loading');
+                const list = document.getElementById('notifications-list');
+                const empty = document.getElementById('notifications-empty');
+                
+                if (loading) loading.style.display = 'block';
+                if (list) {
+                    list.style.display = 'none';
+                    list.innerHTML = '';
+                }
+                if (empty) empty.style.display = 'none';
+                
+                fetch('/notifications/recentes')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (loading) loading.style.display = 'none';
+                        
+                        if (data.notifications.length === 0) {
+                            if (empty) empty.style.display = 'block';
+                        } else {
+                            if (list) {
+                                list.style.display = 'block';
+                                
+                                data.notifications.forEach(notif => {
+                                    const notifElement = createNotificationElement(notif);
+                                    list.appendChild(notifElement);
+                                });
+                            }
+                        }
+                        
+                        // Update badge
+                        const countBadge = document.getElementById('notification-count-badge');
+                        if (countBadge) {
+                            countBadge.textContent = data.nonLues > 99 ? '99+' : data.nonLues;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading notifications:', error);
+                        if (loading) loading.style.display = 'none';
+                        if (empty) empty.style.display = 'block';
+                    });
+            }
+
+            // Create notification element
+            function createNotificationElement(notif) {
+                const li = document.createElement('li');
+                li.className = `notification-item ${!notif.lu ? 'notification-unread' : ''}`;
+                
+                const iconClass = {
+                    'success': 'bi-check-circle text-success',
+                    'warning': 'bi-exclamation-triangle text-warning',
+                    'info': 'bi-info-circle text-info',
+                    'emprunt': 'bi-book text-primary',
+                    'nouveau_livre': 'bi-book-fill text-primary'
+                }[notif.type] || 'bi-bell text-secondary';
+                
+                li.innerHTML = `
+                    <a class="dropdown-item notification-link ${!notif.lu ? 'fw-semibold' : ''}" href="${notif.lien || '#'}" style="white-space: normal;">
+                        <div class="d-flex align-items-start gap-2">
+                            <i class="bi ${iconClass} mt-1" style="font-size: 1.1rem; flex-shrink: 0;"></i>
+                            <div class="flex-fill">
+                                <div class="d-flex justify-content-between align-items-start mb-1">
+                                    <span style="font-size: 0.9rem;">${escapeHtml(notif.titre)}</span>
+                                    ${!notif.lu ? '<span class="badge bg-primary rounded-pill" style="font-size: 0.55rem; padding: 0.15em 0.4em;">New</span>' : ''}
+                                </div>
+                                <p class="mb-1" style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.3;">${escapeHtml(notif.message)}</p>
+                                <small class="text-muted" style="font-size: 0.7rem;">
+                                    <i class="bi bi-clock"></i> ${notif.dateCreationFormatted}
+                                </small>
+                            </div>
+                        </div>
+                    </a>
+                `;
+                
+                // Mark as read when clicked
+                if (!notif.lu && notif.lien) {
+                    const link = li.querySelector('.notification-link');
+                    link.addEventListener('click', function(e) {
+                        if (notif.lien) {
+                            markAsRead(notif.id, li);
+                        }
+                    });
+                }
+                
+                return li;
+            }
+
+            // Mark notification as read
+            function markAsRead(id, element) {
+                fetch(`/notifications/marquer-lu/${id}`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'}
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        element.classList.remove('notification-unread');
+                        const link = element.querySelector('.notification-link');
+                        if (link) link.classList.remove('fw-semibold');
+                        const badge = element.querySelector('.badge');
+                        if (badge) badge.remove();
+                        updateNotificationBadge();
+                    }
+                });
+            }
+
+            // Escape HTML
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            // Update badge on page load
+            updateNotificationBadge();
+            
+            // Update badge every 30 seconds
+            setInterval(updateNotificationBadge, 30000);
+        </script>
+        {% endif %}
+        
+        <footer class="text-white py-3 mt-5">
+            <div class="container">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                    <div class="d-flex align-items-center gap-3 flex-wrap">
+                        <h6 class="mb-0">
+                            <i class="bi bi-book"></i> Libria
+                        </h6>
+                        <span class="opacity-75" style="font-size: 0.9rem;">Your modern library management system</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-3 flex-wrap">
+                        <span class="opacity-75" style="font-size: 0.9rem;">
+                            &copy; {{ "now"|date("Y") }} Libria. All rights reserved.
+                        </span>
+                        <div class="d-flex align-items-center gap-2">
+                            <a href="#" class="text-white opacity-75" style="text-decoration: none; font-size: 1.1rem;" title="GitHub">
+                                <i class="bi bi-github"></i>
+                            </a>
+                            <a href="#" class="text-white opacity-75" style="text-decoration: none; font-size: 1.1rem;" title="Twitter">
+                                <i class="bi bi-twitter"></i>
+                            </a>
+                            <a href="#" class="text-white opacity-75" style="text-decoration: none; font-size: 1.1rem;" title="LinkedIn">
+                                <i class="bi bi-linkedin"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        
+        <script>
+            // Theme Toggle Functionality
+            document.addEventListener('DOMContentLoaded', function() {
+                const themeToggle = document.getElementById('themeToggle');
+                const themeIcon = document.getElementById('themeIcon');
+                const html = document.documentElement;
+                
+                if (!themeToggle || !themeIcon) {
+                    console.error('Theme toggle elements not found');
+                    return;
+                }
+                
+                // Get saved theme or default to light
+                const currentTheme = localStorage.getItem('theme') || 'light';
+                
+                // Apply saved theme
+                if (currentTheme === 'dark') {
+                    html.setAttribute('data-theme', 'dark');
+                    themeIcon.classList.remove('bi-sun-fill');
+                    themeIcon.classList.add('bi-moon-fill');
+                } else {
+                    html.removeAttribute('data-theme');
+                    themeIcon.classList.remove('bi-moon-fill');
+                    themeIcon.classList.add('bi-sun-fill');
+                }
+                
+                // Toggle theme on button click
+                themeToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const isDark = html.getAttribute('data-theme') === 'dark';
+                    
+                    if (isDark) {
+                        // Switch to light mode
+                        html.removeAttribute('data-theme');
+                        localStorage.setItem('theme', 'light');
+                        themeIcon.classList.remove('bi-moon-fill');
+                        themeIcon.classList.add('bi-sun-fill');
+                    } else {
+                        // Switch to dark mode
+                        html.setAttribute('data-theme', 'dark');
+                        localStorage.setItem('theme', 'dark');
+                        themeIcon.classList.remove('bi-sun-fill');
+                        themeIcon.classList.add('bi-moon-fill');
+                    }
+                });
+            });
+
+            // Update cart count
+            function updateCartCount() {
+                fetch('/cart/count')
+                    .then(response => response.json())
+                    .then(data => {
+                        const badge = document.getElementById('cart-badge');
+                        const countBadge = document.getElementById('cart-count-badge');
+                        
+                        if (data.count > 0) {
+                            badge.textContent = data.count;
+                            badge.style.display = 'inline-block';
+                            countBadge.textContent = data.count;
+                        } else {
+                            badge.style.display = 'none';
+                            countBadge.textContent = '0';
+                        }
+                        
+                        // Also refresh cart dropdown if open
+                        const dropdown = document.getElementById('cart-dropdown-menu');
+                        if (dropdown && dropdown.classList.contains('show')) {
+                            loadCartDropdown();
+                        }
+                    })
+                    .catch(error => console.error('Error updating cart count:', error));
+            }
+
+            // Refresh cart dropdown (can be called from other pages)
+            function refreshCartDropdown() {
+                loadCartDropdown();
+            }
+
+            // Load cart items for dropdown
+            function loadCartDropdown() {
+                const loading = document.getElementById('cart-loading');
+                const items = document.getElementById('cart-items');
+                const empty = document.getElementById('cart-empty');
+                const total = document.getElementById('cart-total');
+                
+                loading.style.display = 'block';
+                items.innerHTML = '';
+                empty.style.display = 'none';
+                
+                fetch('/cart')
+                    .then(response => response.text())
+                    .then(html => {
+                        loading.style.display = 'none';
+                        
+                        // Extract cart items from the cart page HTML
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const cartItems = doc.querySelectorAll('.cart-item-premium');
+                        
+                        if (cartItems.length > 0) {
+                            let cartHtml = '';
+                            let totalAmount = 0;
+                            
+                            cartItems.forEach((item, index) => {
+                                if (index < 3) { // Show max 3 items in dropdown
+                                    const title = item.querySelector('.product-title-premium')?.textContent || 'Unknown Book';
+                                    const price = item.querySelector('.product-price-premium')?.textContent || '0.00 TND';
+                                    const quantity = item.querySelector('.quantity-input-premium')?.value || '1';
+                                    const imageElement = item.querySelector('.product-image-premium img');
+                                    let image = '';
+                                    if (imageElement) {
+                                        // Si l'élément image existe, on récupère son attribut src
+                                        const src = imageElement.getAttribute('src');
+                                        // On s'assure que le chemin est absolu en ajoutant le domaine si nécessaire
+                                        image = src.startsWith('http') ? src : window.location.origin + (src.startsWith('/') ? '' : '/') + src;
+                                    }
+                                    
+                                    const priceNum = parseFloat(price.replace(/[^0-9.]/g, ''));
+                                    const quantityNum = parseInt(quantity);
+                                    const itemTotal = priceNum * quantityNum;
+                                    totalAmount += itemTotal;
+                                    
+                                    cartHtml += `
+                                        <div class="cart-item px-3 py-2 border-bottom">
+                                            <div class="d-flex align-items-center">
+                                                <img src="${image}" alt="${title}" style="width: 40px; height: 50px; object-fit: cover; border-radius: 4px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                                <div style="width: 40px; height: 50px; background: var(--gray-light); border-radius: 4px; display: none; align-items: center; justify-content: center;">
+                                                    <i class="bi bi-book" style="color: var(--gray); font-size: 0.8rem;"></i>
+                                                </div>
+                                                <div class="ms-3 flex-grow-1">
+                                                    <div class="fw-semibold text-truncate" style="font-size: 0.85rem; max-width: 200px;">${title}</div>
+                                                    <div class="text-muted small">${quantity} × ${price}</div>
+                                                </div>
+                                                <div class="text-end">
+                                                    <div class="fw-bold" style="font-size: 0.85rem;">${itemTotal.toFixed(2)} TND</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `;
+                                }
+                            });
+                            
+                            if (cartItems.length > 3) {
+                                cartHtml += `
+                                    <div class="text-center px-3 py-2">
+                                        <small class="text-muted">+${cartItems.length - 3} more items</small>
+                                    </div>
+                                `;
+                            }
+                            
+                            items.innerHTML = cartHtml;
+                            total.textContent = totalAmount.toFixed(2) + ' TND';
+                        } else {
+                            empty.style.display = 'block';
+                            total.textContent = '0.00 TND';
+                        }
+                    })
+                    .catch(error => {
+                        loading.style.display = 'none';
+                        empty.style.display = 'block';
+                        console.error('Error loading cart:', error);
+                    });
+            }
+
+            // Load cart dropdown when opened
+            document.getElementById('cartDropdown')?.addEventListener('shown.bs.dropdown', function() {
+                loadCartDropdown();
+            });
+
+            // Update cart count on page load
+            document.addEventListener('DOMContentLoaded', updateCartCount);
+
+            // Shared Confirmation Modal System
+            let sharedPendingAction = null;
+            
+            window.showSharedConfirmModal = function(message, action, title = 'Confirm Action') {
+                document.getElementById('sharedConfirmModalLabel').textContent = title;
+                document.getElementById('sharedConfirmMessage').textContent = message;
+                sharedPendingAction = action;
+                
+                const modal = new bootstrap.Modal(document.getElementById('sharedConfirmModal'), {
+                    backdrop: false,
+                    keyboard: true,
+                    focus: true
+                });
+                modal.show();
+            };
+
+            // Setup shared modal confirm button
+            document.addEventListener('DOMContentLoaded', function() {
+                const confirmButton = document.getElementById('sharedConfirmButton');
+                if (confirmButton) {
+                    confirmButton.addEventListener('click', function() {
+                        if (sharedPendingAction) {
+                            sharedPendingAction();
+                            sharedPendingAction = null;
+                        }
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('sharedConfirmModal'));
+                        if (modal) {
+                            modal.hide();
+                        }
+                    });
+                }
+            });
+        </script>
+    </body>
+
+    <!-- Shared Confirmation Modal -->
+    <div class="modal fade" id="sharedConfirmModal" tabindex="-1" aria-labelledby="sharedConfirmModalLabel" aria-hidden="true" style="z-index: 10500;">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="sharedConfirmModalLabel">Confirm Action</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="sharedConfirmMessage">Are you sure you want to proceed?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-library" id="sharedConfirmButton">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</html>

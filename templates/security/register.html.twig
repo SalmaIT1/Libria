@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Register - Libria{% endblock %}
+
+{% block body %}
+<div class="hero-section">
+    <div class="container text-center position-relative" style="z-index: 2;">
+        <h1 class="hero-title">Join Libria</h1>
+        <p class="hero-subtitle">Create your library account</p>
+    </div>
+</div>
+
+<div class="container my-5" style="position: relative; z-index: 1;">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="library-card p-5">
+                {{ form_start(registrationForm, {'attr': {'class': 'needs-validation'}}) }}
+                    <div class="mb-3">
+                        {{ form_label(registrationForm.email, null, {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(registrationForm.email) }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form_label(registrationForm.firstName, null, {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(registrationForm.firstName, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(registrationForm.firstName) }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form_label(registrationForm.lastName, null, {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(registrationForm.lastName, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(registrationForm.lastName) }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form_label(registrationForm.plainPassword.first, null, {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(registrationForm.plainPassword.first, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(registrationForm.plainPassword.first) }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form_label(registrationForm.plainPassword.second, null, {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(registrationForm.plainPassword.second, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(registrationForm.plainPassword.second) }}
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-library btn-lg">
+                            <i class="bi bi-person-plus"></i> Create Account
+                        </button>
+                    </div>
+                {{ form_end(registrationForm) }}
+
+                <div class="text-center mt-4">
+                    <p class="book-meta">Already have an account? 
+                        <a href="{{ path('login') }}" class="text-decoration-none" style="color: var(--text-secondary); font-weight: bold;">
+                            Login here
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

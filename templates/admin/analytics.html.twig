@@ -1,0 +1,263 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block page_title %}
+    <h1>📊 Tableau de Bord Analytics</h1>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Statistiques Générales -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ stats.totalUsers }}</h4>
+                            <p>Utilisateurs</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-people fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ stats.totalOrders }}</h4>
+                            <p>Commandes Totales</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-cart fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ stats.totalBooks }}</h4>
+                            <p>Livres</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-book fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4>{{ stats.totalRevenue|number_format(2, ',', ' ') }} TND</h4>
+                            <p>Chiffre d'Affaires</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-currency-dollar fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alertes Stock -->
+    {% if stockAlerts %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <h5 class="alert-heading">⚠️ Alertes de Stock</h5>
+                <div class="row">
+                    {% for alert in stockAlerts %}
+                    <div class="col-md-4 mb-2">
+                        <div class="alert {{ alert.severity == 'critical' ? 'alert-danger' : 'alert-warning' }} mb-0">
+                            <strong>{{ alert.titre }}</strong><br>
+                            <small>{{ alert.message }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <!-- Chiffre d'Affaires -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5>📈 Chiffre d'Affaires (12 derniers mois)</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="revenueChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistiques Coupons -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>🎫 Statistiques Coupons</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <small class="text-muted">Total Coupons</small>
+                        <h4>{{ couponStats.totalCoupons }}</h4>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-muted">Coupons Actifs</small>
+                        <h4>{{ couponStats.activeCoupons }}</h4>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-muted">Taux d'Utilisation</small>
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width: {{ couponStats.usageRate }}%">
+                                {{ couponStats.usageRate }}%
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-muted">Total Utilisations</small>
+                        <h4>{{ couponStats.totalUses }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <!-- Produits les plus Vendus -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>🏆 Produits les plus Vendus</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Livre</th>
+                                    <th>Unités</th>
+                                    <th>Ventes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for product in topProducts %}
+                                <tr>
+                                    <td>{{ product.titre|u.truncate(30) }}</td>
+                                    <td>{{ product.totalQuantity }}</td>
+                                    <td>{{ product.salesCount }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mouvements Récents -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>📦 Mouvements de Stock Récents</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Livre</th>
+                                    <th>Type</th>
+                                    <th>Quantité</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for movement in recentMovements %}
+                                <tr>
+                                    <td>{{ movement.livre.titre|u.truncate(25) }}</td>
+                                    <td>
+                                        <span class="badge badge-{{ movement.isPositive() ? 'success' : 'warning' }}">
+                                            {{ movement.formattedType }}
+                                        </span>
+                                    </td>
+                                    <td>{{ movement.quantity }}</td>
+                                    <td>{{ movement.createdAt|date('d/m H:i') }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Graphique Chiffre d'Affaires
+const ctx = document.getElementById('revenueChart').getContext('2d');
+const revenueChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: [{% for revenue in revenueStats %}'{{ revenue.month }}'{% if not loop.last %},{% endif %}{% endfor %}],
+        datasets: [{
+            label: 'Chiffre d\'Affaires (TND)',
+            data: [{% for revenue in revenueStats %}{{ revenue.revenue }}{% if not loop.last %},{% endif %}{% endfor %}],
+            borderColor: 'rgb(75, 192, 192)',
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            tension: 0.1
+        }, {
+            label: 'Nombre de Commandes',
+            data: [{% for revenue in revenueStats %}{{ revenue.orders }}{% if not loop.last %},{% endif %}{% endfor %}],
+            borderColor: 'rgb(255, 99, 132)',
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            tension: 0.1,
+            yAxisID: 'y1'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                type: 'linear',
+                display: true,
+                position: 'left',
+                title: {
+                    display: true,
+                    text: 'TND'
+                }
+            },
+            y1: {
+                type: 'linear',
+                display: true,
+                position: 'right',
+                title: {
+                    display: true,
+                    text: 'Commandes'
+                },
+                grid: {
+                    drawOnChartArea: false
+                }
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,568 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Checkout - Libria{% endblock %}
+
+{% block body %}
+<div class="container mt-5 mb-5">
+    <!-- Progress Steps -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="checkout-progress">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="progress-step completed">
+                        <div class="step-circle">
+                            <i class="bi bi-cart-check"></i>
+                        </div>
+                        <div class="step-label">Cart</div>
+                    </div>
+                    <div class="progress-line completed"></div>
+                    <div class="progress-step active">
+                        <div class="step-circle">
+                            <i class="bi bi-credit-card"></i>
+                        </div>
+                        <div class="step-label">Checkout</div>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step">
+                        <div class="step-circle">
+                            <i class="bi bi-check-circle"></i>
+                        </div>
+                        <div class="step-label">Confirmation</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Main Checkout Form -->
+        <div class="col-lg-8">
+            <div class="checkout-form-card">
+                <div class="card-header-gradient">
+                    <h4 class="mb-0">
+                        <i class="bi bi-truck me-2"></i>
+                        Shipping & Payment Information
+                    </h4>
+                </div>
+                
+                <div class="card-body p-4">
+                    {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'class': 'checkout-form'}}) }}
+                    
+                    <!-- Shipping Information -->
+                    <div class="section-group mb-5">
+                        <div class="section-title">
+                            <i class="bi bi-geo-alt"></i>
+                            <h5>Shipping Information</h5>
+                        </div>
+                        
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    {{ form_widget(form.shippingAddress, {'attr': {'class': 'form-control', 'placeholder': 'Enter your complete shipping address', 'style': 'min-height: 100px;'}}) }}
+                                    {{ form_label(form.shippingAddress, 'Shipping Address', {'label_attr': {'class': 'form-label'}}) }}
+                                    {{ form_errors(form.shippingAddress) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Billing Information -->
+                    <div class="section-group mb-5">
+                        <div class="section-title">
+                            <i class="bi bi-receipt"></i>
+                            <h5>Billing Information</h5>
+                            <small class="text-muted">Leave same as shipping if identical</small>
+                        </div>
+                        
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    {{ form_widget(form.billingAddress, {'attr': {'class': 'form-control', 'placeholder': 'Enter your billing address (same as shipping)', 'style': 'min-height: 100px;'}}) }}
+                                    {{ form_label(form.billingAddress, 'Billing Address', {'label_attr': {'class': 'form-label'}}) }}
+                                    {{ form_errors(form.billingAddress) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Method -->
+                    <div class="section-group mb-5">
+                        <div class="section-title">
+                            <i class="bi bi-credit-card"></i>
+                            <h5>Payment Method</h5>
+                        </div>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    {{ form_widget(form.paymentMethod, {'attr': {'class': 'form-select'}}) }}
+                                    {{ form_label(form.paymentMethod, 'Select Payment Method', {'label_attr': {'class': 'form-label'}}) }}
+                                    {{ form_errors(form.paymentMethod) }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    {{ form_widget(form.notes, {'attr': {'class': 'form-control', 'placeholder': 'Special instructions or notes (optional)'}}) }}
+                                    {{ form_label(form.notes, 'Order Notes', {'label_attr': {'class': 'form-label'}}) }}
+                                    {{ form_errors(form.notes) }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Method Cards -->
+                        <div class="payment-methods-grid mt-4">
+                            <div class="payment-method-card">
+                                <div class="card-icon">
+                                    <i class="bi bi-credit-card-2-front"></i>
+                                </div>
+                                <div class="card-info">
+                                    <h6>Credit/Debit Card</h6>
+                                    <small>Visa, Mastercard, Amex</small>
+                                </div>
+                            </div>
+                            <div class="payment-method-card">
+                                <div class="card-icon">
+                                    <i class="bi bi-paypal"></i>
+                                </div>
+                                <div class="card-info">
+                                    <h6>PayPal</h6>
+                                    <small>Fast & secure</small>
+                                </div>
+                            </div>
+                            <div class="payment-method-card">
+                                <div class="card-icon">
+                                    <i class="bi bi-bank"></i>
+                                </div>
+                                <div class="card-info">
+                                    <h6>Bank Transfer</h6>
+                                    <small>Direct deposit</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="checkout-actions">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <a href="{{ path('cart') }}" class="btn btn-outline-secondary w-100">
+                                    <i class="bi bi-arrow-left me-2"></i>
+                                    Back to Cart
+                                </a>
+                            </div>
+                            <div class="col-md-6">
+                                <button type="submit" class="btn btn-primary w-100 btn-lg">
+                                    <i class="bi bi-shield-check me-2"></i>
+                                    Place Order
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="col-lg-4">
+            <div class="sticky-top" style="top: 20px;">
+                <!-- Order Summary Card -->
+                <div class="order-summary-card">
+                    <div class="card-header-gradient">
+                        <h5 class="mb-0">
+                            <i class="bi bi-receipt-cutoff me-2"></i>
+                            Order Summary
+                        </h5>
+                    </div>
+                    
+                    <div class="card-body p-4">
+                        <!-- Items List -->
+                        <div class="order-items mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="mb-0">Items ({{ panier.lignePaniers|length }})</h6>
+                                <span class="badge bg-primary">{{ panier.lignePaniers|length }}</span>
+                            </div>
+                            
+                            {% for lignePanier in panier.lignePaniers %}
+                                <div class="order-item">
+                                    <div class="item-info">
+                                        <div class="item-title">{{ lignePanier.livre.titre }}</div>
+                                        <div class="item-details">Qty: {{ lignePanier.quantity }}</div>
+                                    </div>
+                                    <div class="item-price">{{ lignePanier.getFormattedTotal() }}</div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Price Breakdown -->
+                        <div class="price-breakdown">
+                            <div class="price-row">
+                                <span>Subtotal</span>
+                                <span>{{ panier.getFormattedTotalAmount() }}</span>
+                            </div>
+                            <div class="price-row">
+                                <span>Shipping</span>
+                                <span>8.00 TND</span>
+                            </div>
+                            <div class="price-row discount-row">
+                                <span>
+                                    <i class="bi bi-tag me-1"></i>
+                                    Discount
+                                    {% if panier.coupon %}
+                                        <small class="text-muted">({{ panier.coupon.code }})</small>
+                                    {% endif %}
+                                </span>
+                                <span class="text-success">-{{ panier.getFormattedDiscountAmount() }}</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Total -->
+                        <div class="total-section">
+                            <div class="total-row">
+                                <span>Total</span>
+                                <span class="total-amount">{{ (panier.getTotalAmountWithDiscount() + 8.00)|number_format(2, '.', ' ') }} TND</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shipping Info Card -->
+                <div class="info-card mt-3">
+                    <div class="card-body p-4">
+                        <h6 class="mb-3">
+                            <i class="bi bi-truck me-2 text-primary"></i>
+                            Shipping Information
+                        </h6>
+                        <ul class="info-list">
+                            <li>
+                                <i class="bi bi-clock"></i>
+                                <span>Standard delivery: 3-5 business days</span>
+                            </li>
+                            <li>
+                                <i class="bi bi-geo-alt"></i>
+                                <span>Tracking number provided</span>
+                            </li>
+                            <li>
+                                <i class="bi bi-shield-check"></i>
+                                <span>Insured delivery</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Security Badge -->
+                <div class="security-badge mt-3">
+                    <div class="d-flex align-items-center justify-content-center">
+                        <i class="bi bi-shield-check text-success me-2"></i>
+                        <span class="small">Secure SSL Encrypted Checkout</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Checkout Progress */
+.checkout-progress {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.progress-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.step-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+}
+
+.progress-step.completed .step-circle {
+    background: linear-gradient(135deg, var(--success), #28a745);
+    color: white;
+}
+
+.progress-step.active .step-circle {
+    background: linear-gradient(135deg, var(--primary), #0056b3);
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+}
+
+.progress-step:not(.completed):not(.active) .step-circle {
+    background: var(--gray-light);
+    color: var(--gray);
+}
+
+.step-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-align: center;
+}
+
+.progress-line {
+    flex: 1;
+    height: 2px;
+    background: var(--gray-light);
+    position: relative;
+    top: -20px;
+}
+
+.progress-line.completed {
+    background: linear-gradient(90deg, var(--success), #28a745);
+}
+
+/* Form Cards */
+.checkout-form-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+.card-header-gradient {
+    background: linear-gradient(135deg, var(--primary), #0056b3);
+    color: white;
+    padding: 1.5rem;
+    border: none;
+}
+
+/* Section Groups */
+.section-group {
+    padding: 1.5rem;
+    border-radius: 12px;
+    background: var(--bg-light);
+    border: 1px solid var(--border-color);
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.section-title i {
+    font-size: 1.5rem;
+    color: var(--primary);
+}
+
+.section-title h5 {
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.section-title small {
+    margin-left: auto;
+}
+
+/* Payment Methods Grid */
+.payment-methods-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.payment-method-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    background: white;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.payment-method-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 123, 255, 0.1);
+}
+
+.card-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: var(--bg-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: var(--primary);
+}
+
+.card-info h6 {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.card-info small {
+    color: var(--text-muted);
+}
+
+/* Order Summary */
+.order-summary-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+.order-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-color-light);
+}
+
+.order-item:last-child {
+    border-bottom: none;
+}
+
+.item-title {
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.item-details {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.item-price {
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.price-breakdown {
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 0;
+    margin-bottom: 1rem;
+}
+
+.price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+}
+
+.discount-row {
+    color: var(--success);
+}
+
+.total-section {
+    background: linear-gradient(135deg, var(--primary-light), var(--primary));
+    padding: 1rem;
+    border-radius: 12px;
+    margin-top: 1rem;
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+}
+
+.total-amount {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+/* Info Cards */
+.info-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--border-color);
+}
+
+.info-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.info-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    font-size: 0.9rem;
+}
+
+.info-list i {
+    color: var(--primary);
+    width: 20px;
+}
+
+.security-badge {
+    background: linear-gradient(135deg, var(--success-light), var(--success));
+    color: white;
+    padding: 1rem;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: 500;
+}
+
+/* Form Improvements */
+.form-floating > .form-control {
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.form-floating > .form-control:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.1);
+}
+
+.form-floating > .form-select {
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.form-floating > .form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .checkout-progress .d-flex {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .progress-line {
+        display: none;
+    }
+    
+    .payment-methods-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,167 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Authors - Libria{% endblock %}
+
+{% block body %}
+<div class="hero-section">
+    <div class="container text-center position-relative" style="z-index: 2;">
+        <h1 class="hero-title">Authors</h1>
+        <p class="hero-subtitle">Discover our talented writers and their literary works</p>
+    </div>
+</div>
+
+<div class="container mb-5" style="position: relative; z-index: 1;">
+    {% if authors|length > 0 %}
+        <div class="row g-4">
+            {% for author in authors %}
+                <div class="col-sm-6 col-md-4 col-lg-3">
+                    <div class="author-card">
+                        <div class="author-avatar">
+                            <span class="author-initials">
+                                {{ (author.prenom|default('')|length > 0 ? author.prenom|split('')|first|upper : '?') }}{{ (author.nom|default('')|length > 0 ? author.nom|split('')|first|upper : '') }}
+                            </span>
+                        </div>
+                        <div class="author-info">
+                            <h5 class="author-name">{{ author.prenom }} {{ author.nom }}</h5>
+                            <a href="{{ path('author_show', {id: author.id}) }}" class="author-link">
+                                View Profile <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="library-card p-5 text-center">
+            <div style="width: 120px; height: 120px; margin: 0 auto 2rem; background: linear-gradient(135deg, var(--coffee), var(--caramel)); border-radius: 30px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-lg);">
+                <i class="bi bi-person" style="font-size: 4rem; color: white;"></i>
+            </div>
+            <h3 class="book-title mt-3" style="font-size: 2rem;">No Authors Found</h3>
+            <p class="book-meta fs-5">Check back later for new authors</p>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    .author-card {
+        background: var(--bg-card);
+        backdrop-filter: blur(10px);
+        border-radius: 1.5rem;
+        padding: 2rem 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .author-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--caramel), var(--mocca));
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+    }
+
+    .author-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 40px rgba(171, 119, 67, 0.15);
+        border-color: var(--caramel);
+    }
+
+    .author-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .author-avatar {
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--vanilla), var(--caramel));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 8px 24px rgba(171, 119, 67, 0.2);
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .author-card:hover .author-avatar {
+        transform: scale(1.1);
+        box-shadow: 0 12px 32px rgba(171, 119, 67, 0.3);
+    }
+
+    .author-initials {
+        font-family: 'Playfair Display', serif;
+        font-size: 2rem;
+        font-weight: 600;
+        color: white;
+        letter-spacing: 0.05em;
+    }
+
+    .author-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .author-name {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+        line-height: 1.4;
+    }
+
+    .author-link {
+        color: var(--caramel);
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.95rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        margin-top: auto;
+    }
+
+    .author-link:hover {
+        color: var(--mocca);
+        gap: 0.75rem;
+    }
+
+    .author-link i {
+        transition: transform 0.3s ease;
+    }
+
+    .author-link:hover i {
+        transform: translateX(4px);
+    }
+
+    [data-theme='dark'] .author-card {
+        background: rgba(30, 30, 30, 0.95);
+        border-color: rgba(215, 189, 166, 0.2);
+    }
+
+    [data-theme='dark'] .author-avatar {
+        background: linear-gradient(135deg, var(--caramel), var(--mocca));
+    }
+
+    [data-theme='dark'] .author-card:hover {
+        border-color: var(--vanilla);
+        box-shadow: 0 12px 40px rgba(215, 189, 166, 0.2);
+    }
+</style>
+{% endblock %}

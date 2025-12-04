@@ -1,0 +1,679 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Books - Libria{% endblock %}
+
+{% block body %}
+<div class="hero-section">
+    <div class="container text-center position-relative" style="z-index: 2;">
+        <h1 class="hero-title">Our Book Collection</h1>
+        <p class="hero-subtitle">Discover amazing books from our library</p>
+    </div>
+</div>
+
+<div class="container mb-5" style="position: relative; z-index: 1;">
+    <div class="d-flex justify-content-end align-items-center mb-3 gap-2">
+        <button type="button" class="btn btn-outline-primary btn-sm" id="btn-view-grid" title="Affichage grille" aria-label="Affichage grille">
+            <i class="bi bi-grid-fill"></i>
+        </button>
+        <button type="button" class="btn btn-outline-primary btn-sm" id="btn-view-list" title="Affichage liste" aria-label="Affichage liste">
+            <i class="bi bi-list"></i>
+        </button>
+        <button type="button" class="btn btn-library btn-sm" data-bs-toggle="collapse" data-bs-target="#filtersCollapse" id="filtersToggleBtn" aria-expanded="false" aria-controls="filtersCollapse">
+            <i class="bi bi-funnel" id="filterFunnelIcon"></i> Filters
+        </button>
+    </div>
+    <!-- Inline Collapsible Filters Section -->
+    <div class="collapse mb-3" id="filtersCollapse">
+        <div class="filters-modern position-relative">
+            <button type="button" class="btn btn-sm close-filter-btn position-absolute top-0 end-0 mt-2 me-2" data-bs-toggle="collapse" data-bs-target="#filtersCollapse" aria-label="Close filters" tabindex="0" style="z-index:10;background:rgba(220,216,216,0.28);backdrop-filter:blur(2px);border-radius:1.2rem;border:none;font-size:1.2rem;padding:.22em .66em;">
+                <i class="bi bi-x"></i>
+            </button>
+            <div class="d-flex align-items-center mb-2 gap-2">
+                <div class="filter-icon-glass rounded-circle d-flex align-items-center justify-content-center" style="width:2.1rem;height:2.1rem;">
+                    <i class="bi bi-funnel" style="font-size:1.3rem; color: var(--caramel);"></i>
+                </div>
+                <h5 class="fw-bold mb-0" style="font-family: 'Playfair Display', serif; letter-spacing:.5px;">Filters & Search</h5>
+            </div>
+            <div class="modern-divider mb-3"></div>
+            {{ form_start(form, {'attr': {'class': 'row g-2', 'id': 'filter-form'}, 'method': 'GET'}) }}
+                <div class="col-md-12">
+                    <div class="input-group input-group-sm mb-1">
+                        <span class="input-group-text bg-white modern-input-addon">
+                            <i class="bi bi-search text-muted"></i>
+                        </span>
+                        {{ form_widget(form.search, {'attr': {'class': 'form-control form-control-sm modern-input'}}) }}
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    {{ form_label(form.categorie, null, {'label_attr': {'class': 'fw-semibold mb-1', 'style': 'font-size: 0.99rem;'}}) }}
+                    {{ form_widget(form.categorie, {'attr': {'class': 'form-select form-select-sm modern-input'}}) }}
+                </div>
+                <div class="col-md-3">
+                    {{ form_label(form.auteur, null, {'label_attr': {'class': 'fw-semibold mb-1', 'style': 'font-size: 0.99rem;'}}) }}
+                    {{ form_widget(form.auteur, {'attr': {'class': 'form-select form-select-sm modern-input'}}) }}
+                </div>
+                <div class="col-md-3">
+                    {{ form_label(form.editeur, null, {'label_attr': {'class': 'fw-semibold mb-1', 'style': 'font-size: 0.99rem;'}}) }}
+                    {{ form_widget(form.editeur, {'attr': {'class': 'form-select form-select-sm modern-input'}}) }}
+                </div>
+                <div class="col-md-3">
+                    {{ form_label(form.sortBy, null, {'label_attr': {'class': 'fw-semibold mb-1', 'style': 'font-size: 0.99rem;'}}) }}
+                    {{ form_widget(form.sortBy, {'attr': {'class': 'form-select form-select-sm modern-input'}}) }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold mb-1" style="font-size: 0.99rem;">Price Range (TND)</label>
+                    <div class="input-group input-group-sm">
+                        {{ form_widget(form.minPrice, {'attr': {'placeholder': 'Min', 'class': 'form-control form-control-sm modern-input'}}) }}
+                        <span class="input-group-text bg-white modern-input-addon">-</span>
+                        {{ form_widget(form.maxPrice, {'attr': {'placeholder': 'Max', 'class': 'form-control form-control-sm modern-input'}}) }}
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    {{ form_label(form.minRating, null, {'label_attr': {'class': 'fw-semibold mb-1', 'style': 'font-size: 0.99rem;'}}) }}
+                    {{ form_widget(form.minRating, {'attr': {'class': 'form-control form-control-sm modern-input', 'placeholder': 'Min rating'}}) }}
+                </div>
+                <div class="col-md-3">
+                    {{ form_label(form.disponible, null, {'label_attr': {'class': 'fw-semibold mb-1', 'style': 'font-size: 0.99rem;'}}) }}
+                    {{ form_widget(form.disponible, {'attr': {'class': 'form-select form-select-sm modern-input'}}) }}
+                </div>
+                <div class="col-md-12 d-flex align-items-end gap-2 mt-2">
+                    {{ form_widget(form.filter, {'attr': {'class': 'btn btn-library btn-sm flex-fill modern-btn'}}) }}
+                    {{ form_widget(form.reset, {'attr': {'class': 'btn btn-outline-secondary btn-sm flex-fill modern-btn'}}) }}
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+
+    <!-- Results Count -->
+    {% if pagination.totalItemCount > 0 %}
+        <div class="mb-3">
+            <p class="text-white fw-bold">
+                <i class="bi bi-book"></i> 
+                Found {{ pagination.totalItemCount }} book(s)
+            </p>
+        </div>
+    {% endif %}
+
+    <!-- Books Grid -->
+    {% if pagination.totalItemCount == 0 %}
+        <div class="library-card p-5 text-center">
+            <div style="width: 120px; height: 120px; margin: 0 auto 2rem; background: linear-gradient(135deg, var(--coffee), var(--caramel)); border-radius: 30px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-lg);">
+                <i class="bi bi-search" style="font-size: 4rem; color: white;"></i>
+            </div>
+            <h3 class="book-title mt-3" style="font-size: 2rem;">No Books Found</h3>
+            <p class="book-meta fs-5">Try adjusting your filters or search criteria</p>
+            <a href="{{ path('books') }}" class="btn btn-library mt-3">
+                <i class="bi bi-arrow-counterclockwise"></i> Reset Filters
+            </a>
+        </div>
+    {% else %}
+        <div class="row" id="books-list">
+            {% for livre in pagination %}
+                <div class="col-md-4 col-lg-3 mb-4">
+                    <div class="library-card h-100">
+                        <a href="{{ path('book_show', {id: livre.id}) }}" class="text-decoration-none">
+                            {% if livre.image %}
+                                {% set imagePath = 'uploads/books/' ~ livre.image %}
+                                {% if livre.image ends with '.svg' or livre.image ends with '.jpg' %}
+                                    <img src="{{ asset(imagePath) }}" 
+                                         alt="{{ livre.titre }}" 
+                                         class="book-cover"
+                                         style="object-fit: cover;"
+                                         onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                {% endif %}
+                                <div class="book-cover" style="display: {% if livre.image %}none{% else %}flex{% endif %};">
+                                    <i class="bi bi-book"></i>
+                                </div>
+                            {% else %}
+                                <div class="book-cover">
+                                    <i class="bi bi-book"></i>
+                                </div>
+                            {% endif %}
+                        </a>
+                        <div class="p-4">
+                            <h5 class="book-title mb-3">
+                                <a href="{{ path('book_show', {id: livre.id}) }}" class="text-decoration-none" style="color: var(--text-primary); transition: color 0.3s;">
+                                    {{ livre.titre }}
+                                </a>
+                            </h5>
+                            <div class="mb-3">
+                                {% if livre.auteurs|length > 0 %}
+                                    <p class="book-meta mb-2">
+                                        <i class="bi bi-person-fill" style="color: var(--caramel);"></i> 
+                                        {% for auteur in livre.auteurs %}
+                                            <a href="{{ path('author_show', {id: auteur.id}) }}" class="text-decoration-none" style="font-weight: 500; color: var(--caramel);">
+                                                {{ auteur }}
+                                            </a>{% if not loop.last %}, {% endif %}
+                                        {% endfor %}
+                                    </p>
+                                {% endif %}
+                                {% if livre.editeur %}
+                                    <p class="book-meta mb-2">
+                                        <i class="bi bi-building-fill" style="color: var(--mocca);"></i> 
+                                        <a href="{{ path('publisher_show', {id: livre.editeur.id}) }}" class="text-decoration-none" style="font-weight: 500; color: var(--mocca);">{{ livre.editeur.nomEditeur }}</a>
+                                    </p>
+                                {% endif %}
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <p class="book-meta mb-0">
+                                        <i class="bi bi-file-text-fill" style="color: var(--almond);"></i> 
+                                        <span style="font-weight: 500;">{{ livre.nbPages }} pages</span>
+                                    </p>
+                                    <p class="book-meta mb-0 fw-bold" style="color: var(--text-secondary); font-size: 1.1rem;">
+                                        {{ livre.prix }} TND
+                                    </p>
+                                </div>
+                                
+                                <!-- Rating and Comments Display -->
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div class="d-flex align-items-center gap-2">
+                                        {% if averageRatings[livre.id] is defined and averageRatings[livre.id] > 0 %}
+                                            {% set avgRating = averageRatings[livre.id] %}
+                                            <div class="d-flex align-items-center gap-1">
+                                                {% for i in 1..5 %}
+                                                    {% if i <= (avgRating|round) %}
+                                                        <i class="bi bi-star-fill text-warning" style="font-size: 1rem;"></i>
+                                                    {% else %}
+                                                        <i class="bi bi-star text-muted" style="font-size: 1rem;"></i>
+                                                    {% endif %}
+                                                {% endfor %}
+                                                <span class="ms-1 fw-semibold" style="color: var(--text-secondary); font-size: 0.9rem;">
+                                                    {{ avgRating|number_format(1) }}
+                                                </span>
+                                            </div>
+                                        {% else %}
+                                            <div class="d-flex align-items-center gap-1">
+                                                {% for i in 1..5 %}
+                                                    <i class="bi bi-star text-muted" style="font-size: 1rem;"></i>
+                                                {% endfor %}
+                                                <span class="ms-1 text-muted" style="font-size: 0.9rem;">No rating</span>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    {% set commentCount = commentCounts[livre.id] ?? 0 %}
+                                    <div class="d-flex align-items-center gap-1">
+                                        <i class="bi bi-chat-dots-fill" style="color: var(--caramel); font-size: 1.1rem;"></i>
+                                        <span class="fw-semibold" style="color: var(--text-secondary); font-size: 0.9rem;">
+                                            {{ commentCount }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-grid gap-2">
+                                {% set availableForSale = livre.getAvailableForSaleCount() %}
+                                {% set availableForBorrowing = livre.isAvailableForBorrowing() %}
+                                
+                                {% if app.user and not is_granted('ROLE_ADMIN') and availableForSale > 0 %}
+                                    <button class="btn btn-success add-to-cart" 
+                                            data-livre-id="{{ livre.id }}"
+                                            data-livre-title="{{ livre.titre }}"
+                                            data-livre-price="{{ livre.prix }}">
+                                        <i class="bi bi-cart-plus"></i> Add to Cart
+                                        {% if livre.nbExemplaires <= 5 %}
+                                            <small class="text-warning">({{ availableForSale }} available)</small>
+                                        {% endif %}
+                                    </button>
+                                {% elseif app.user and not is_granted('ROLE_ADMIN') %}
+                                    {% if availableForBorrowing %}
+                                        <button class="btn btn-outline-info" disabled>
+                                            <i class="bi bi-book"></i> Library Only
+                                        </button>
+                                    {% else %}
+                                        <button class="btn btn-outline-secondary" disabled>
+                                            <i class="bi bi-x-circle"></i> Out of Stock
+                                        </button>
+                                    {% endif %}
+                                {% endif %}
+                                <a href="{{ path('book_show', {id: livre.id}) }}" class="btn btn-library">
+                                    <i class="bi bi-eye"></i> View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if pagination.pageCount > 1 %}
+        <div class="d-flex justify-content-center mt-5">
+            {% set route = app.request.attributes.get('_route') %}
+            {% set params = app.request.query.all %}
+            <ul class="pagination">
+                {% if pagination.page > 1 %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ path(route, params|merge({page: pagination.page - 1})) }}">
+                            <i class="bi bi-chevron-left"></i> Previous
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">
+                            <i class="bi bi-chevron-left"></i> Previous
+                        </span>
+                    </li>
+                {% endif %}
+
+                {% set currentPage = pagination.page %}
+                {% set totalPages = pagination.pageCount %}
+                {% set pagesToShow = 5 %}
+                {% set startPage = max(1, currentPage - 2) %}
+                {% set endPage = min(totalPages, currentPage + 2) %}
+                
+                {% if startPage > 1 %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ path(route, params|merge({page: 1})) }}">1</a>
+                    </li>
+                    {% if startPage > 2 %}
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    {% endif %}
+                {% endif %}
+                
+                {% for page in startPage..endPage %}
+                    {% if page == currentPage %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ page }}</span>
+                        </li>
+                    {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ path(route, params|merge({page: page})) }}">{{ page }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if endPage < totalPages %}
+                    {% if endPage < totalPages - 1 %}
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    {% endif %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ path(route, params|merge({page: totalPages})) }}">{{ totalPages }}</a>
+                    </li>
+                {% endif %}
+
+                {% if pagination.page < pagination.pageCount %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ path(route, params|merge({page: pagination.page + 1})) }}">
+                            Next <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">
+                            Next <i class="bi bi-chevron-right"></i>
+                        </span>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+        <div class="text-center mt-3 text-white">
+            <small>Page {{ pagination.page }} of {{ pagination.pageCount }} ({{ pagination.totalItemCount }} total books)</small>
+        </div>
+        {% endif %}
+    {% endif %}
+</div>
+
+<style>
+    .pagination {
+        display: flex;
+        list-style: none;
+        padding: 0;
+        gap: 0.5rem;
+    }
+    .pagination .page-item {
+        margin: 0;
+    }
+    .pagination .page-link {
+        background: var(--bg-card);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--border-color);
+        border-radius: 0.75rem;
+        padding: 0.5rem 1rem;
+        color: var(--text-secondary);
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+    .pagination .page-link:hover {
+        background: linear-gradient(135deg, var(--coffee), var(--caramel));
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+        border-color: var(--coffee);
+    }
+    .pagination .page-item.active .page-link {
+        background: linear-gradient(135deg, var(--coffee), var(--caramel));
+        color: white;
+        border-color: var(--coffee);
+    }
+    
+    [data-theme="dark"] .pagination .page-link {
+        background: rgba(40, 40, 40, 0.95);
+        color: var(--text-secondary);
+    }
+    .pagination .page-item.disabled .page-link {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .filters-modern {
+        background: rgba(255,255,255,0.76);
+        backdrop-filter: blur(11px) saturate(160%);
+        border-radius: 1.7rem;
+        box-shadow: 0 3px 18px 0 rgba(171, 119, 67, 0.12), 0 0.5px 2px rgba(76, 43, 8, 0.09);
+        border-left: 6px solid var(--caramel);
+        transition: box-shadow .3s cubic-bezier(.6,.3,.44,1.08), border 0.3s;
+        padding: 1.2rem 1.2rem 1rem 1.2rem;
+        position: relative;
+    }
+    [data-theme="dark"] .filters-modern {
+        background: rgba(35,35,35,0.90);
+        color: var(--text-primary);
+        box-shadow: 0 3px 16px 0 rgba(171,119,67,0.13), 0 0.5px 2px rgba(30,30,30,0.17);
+        border-left: 6px solid var(--vanilla);
+    }
+    .filters-modern:hover {
+        box-shadow: 0 8px 28px 0 rgba(171, 119, 67, 0.17), 0 1px 5px rgba(76,43,8,0.09);
+        transform: scale(1.012);
+    }
+    .filter-icon-glass {
+        background: rgba(234,224,208,0.32);
+        box-shadow: 0 1.5px 9px #d7bda655;
+        border: 1.6px solid var(--caramel);
+    }
+    [data-theme="dark"] .filter-icon-glass {
+        background: rgba(50,40,30,0.32);
+        border: 1.6px solid var(--vanilla);
+    }
+    .modern-divider {
+        height: 2.5px;
+        width: 50px;
+        background: linear-gradient(90deg, var(--caramel), var(--almond));
+        border-radius: 8px;
+        opacity: 0.72;
+        margin-left: 0.4rem;
+        margin-bottom: .7rem;
+    }
+    .modern-input, .modern-input-addon {
+        border-radius: 1rem !important;
+        border: 1.2px solid var(--border-color) !important;
+        background-clip: padding-box;
+        transition: box-shadow .2s, border .2s;
+        box-shadow: 0 0.5px 2px #b7957f1a;
+    }
+    .modern-input:focus {
+        border: 1.5px solid var(--caramel) !important;
+        outline: none !important;
+        box-shadow: 0 3px 17px -3px var(--caramel), 0 0 2px #ab774365;
+        background: #fff9f6ee;
+    }
+    [data-theme="dark"] .modern-input:focus {
+        border: 1.5px solid var(--vanilla) !important;
+        box-shadow: 0 3px 14px -3px var(--vanilla), 0 0 2px #d7bda655;
+        background: #181512ee;
+    }
+    .modern-btn {
+        border-radius: 1.25rem !important;
+        font-weight: 600;
+        letter-spacing: .5px;
+        box-shadow: 0 .5px 2px #7c55391c;
+        transition: background .18s, color .18s, box-shadow .16s;
+    }
+    .modern-btn:focus, .modern-btn:hover {
+        background: linear-gradient(90deg, var(--caramel), var(--mocca));
+        color: #fff;
+        box-shadow:0 4px 17px -2px #ab774355;
+    }
+    #filtersToggleBtn {
+        border-radius: 2rem;
+        font-weight: 600;
+        letter-spacing:.5px;
+        transition: box-shadow .24s, border .18s;
+    }
+    #filtersToggleBtn:focus, #filtersToggleBtn.active, #filtersToggleBtn[aria-expanded="true"] {
+        box-shadow: 0 0 0 3px #ab774333;
+        border: 2px solid var(--caramel);
+    }
+    .book-list-mode .col-md-4, .book-list-mode .col-lg-3 {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+    }
+    .book-list-mode .library-card {
+        min-height: 260px !important;
+        flex-direction: row;
+        display: flex;
+        padding: 1.5rem 1rem;
+        align-items: stretch;
+    }
+    .book-list-mode .library-card .book-cover,
+    .book-list-mode .library-card img.book-cover {
+        width: 200px !important;
+        height: 240px !important;
+        min-width: 200px;
+        max-width: 200px;
+        margin-right: 1rem;
+        object-fit: cover;
+        border-radius: 12px;
+        flex-shrink: 0;
+    }
+    .book-list-mode .library-card .p-4 {
+        padding: 0.5rem 0 0.5rem 0 !important;
+        margin-left: 0 !important;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        flex: 1;
+    }
+    .book-list-mode .library-card > a,
+    .book-list-mode .library-card > div.p-4,
+    .book-list-mode .library-card > div {
+        flex: 1;
+        min-width: 0;
+    }
+    .book-list-mode .library-card .p-4,
+    .book-list-mode .library-card h5, 
+    .book-list-mode .library-card h6 {
+        margin-top: 0 !important;
+    }
+    .book-list-mode .library-card .book-title {
+        font-size: 1.15rem;
+        margin-bottom: 0.3em !important;
+        line-height: 1.3;
+        margin-top: 0 !important;
+    }
+    .book-list-mode .library-card .book-meta {
+        font-size: 0.85rem;
+        margin-bottom: 0.15rem !important;
+        line-height: 1.2;
+    }
+    .book-list-mode .library-card .d-grid {
+        margin-top: 0.5rem;
+        flex-shrink: 0;
+        min-width: 220px;
+        align-self: flex-end;
+        margin-left: 0;
+    }
+    .book-list-mode .library-card .d-grid .btn {
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+        white-space: nowrap;
+    }
+</style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const collapseElem = document.getElementById('filtersCollapse');
+            const filterBtn = document.getElementById('filtersToggleBtn');
+            const funnelIcon = document.getElementById('filterFunnelIcon');
+            const filterForm = document.getElementById('filter-form');
+            if (collapseElem && filterBtn) {
+                collapseElem.addEventListener('show.bs.collapse', function() {
+                    filterBtn.classList.add('active');
+                    filterBtn.setAttribute('aria-expanded', 'true');
+                    funnelIcon.style.transform = 'rotate(35deg)';
+                });
+                collapseElem.addEventListener('hide.bs.collapse', function() {
+                    filterBtn.classList.remove('active');
+                    filterBtn.setAttribute('aria-expanded', 'false');
+                    funnelIcon.style.transform = '';
+                });
+            }
+            if (filterForm && collapseElem) {
+                filterForm.addEventListener('submit', function(e) {
+                    const bsCollapse = bootstrap.Collapse.getOrCreateInstance(collapseElem);
+                    setTimeout(() => bsCollapse.hide(), 170);
+                });
+                const resetButtons = filterForm.querySelectorAll('[type="reset"], .btn[type="submit"][name="reset"]');
+                resetButtons.forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        const bsCollapse = bootstrap.Collapse.getOrCreateInstance(collapseElem);
+                        setTimeout(() => bsCollapse.hide(), 100);
+                    });
+                });
+            }
+
+            // Grid/List view toggle
+            (function() {
+                const gridBtn = document.getElementById('btn-view-grid');
+                const listBtn = document.getElementById('btn-view-list');
+                const booksList = document.getElementById('books-list');
+                if (!gridBtn || !listBtn || !booksList) return;
+                
+                const CLASS_LIST = 'book-list-mode';
+                function setGrid() {
+                    booksList.classList.remove(CLASS_LIST);
+                    gridBtn.classList.add('btn-primary');
+                    gridBtn.classList.remove('btn-outline-primary');
+                    listBtn.classList.remove('btn-primary');
+                    listBtn.classList.add('btn-outline-primary');
+                    localStorage.setItem('booksView', 'grid');
+                }
+                function setList() {
+                    booksList.classList.add(CLASS_LIST);
+                    gridBtn.classList.remove('btn-primary');
+                    gridBtn.classList.add('btn-outline-primary');
+                    listBtn.classList.add('btn-primary');
+                    listBtn.classList.remove('btn-outline-primary');
+                    localStorage.setItem('booksView', 'list');
+                }
+                gridBtn.addEventListener('click', setGrid);
+                listBtn.addEventListener('click', setList);
+                // On page load
+                if(localStorage.getItem('booksView')==='list') setList();
+                else setGrid();
+            })();
+
+            // Add to Cart functionality
+        console.log('Setting up cart functionality for index page...'); // Debug
+        
+        document.querySelectorAll('.add-to-cart').forEach(button => {
+            console.log('Add to cart button found:', button); // Debug
+            
+            button.addEventListener('click', function() {
+                console.log('Add to cart clicked on index page'); // Debug
+                    const livreId = this.dataset.livreId;
+                    const livreTitle = this.dataset.livreTitle;
+                    const livrePrice = this.dataset.livrePrice;
+                    
+                    // Show loading state
+                    const originalContent = this.innerHTML;
+                    this.innerHTML = '<i class="bi bi-hourglass-split"></i> Adding...';
+                    this.disabled = true;
+                    
+                    fetch(`/cart/add/${livreId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `quantity=1`
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Update cart count in navbar
+                            if (typeof updateCartCount === 'function') {
+                                updateCartCount();
+                            } else {
+                                // Fallback: update cart count manually
+                                const cartBadge = document.getElementById('cart-badge');
+                                if (data.cartCount > 0) {
+                                    cartBadge.textContent = data.cartCount;
+                                    cartBadge.style.display = 'inline-block';
+                                } else {
+                                    cartBadge.style.display = 'none';
+                                }
+                            }
+                            
+                            // Update cart dropdown content
+                            if (typeof refreshCartDropdown === 'function') {
+                                refreshCartDropdown();
+                            } else if (typeof loadCartDropdown === 'function') {
+                                loadCartDropdown();
+                            }
+                            
+                            // Show success message
+                            this.innerHTML = '<i class="bi bi-check-circle"></i> Added!';
+                            this.classList.remove('btn-success');
+                            this.classList.add('btn-outline-success');
+                            
+                            // Show toast notification
+                            showToast(`"${livreTitle}" added to cart successfully!`, 'success');
+                            
+                            // Reset button after delay
+                            setTimeout(() => {
+                                this.innerHTML = originalContent;
+                                this.disabled = false;
+                                this.classList.remove('btn-outline-success');
+                                this.classList.add('btn-success');
+                            }, 2000);
+                        } else {
+                            // Show error
+                            this.innerHTML = originalContent;
+                            this.disabled = false;
+                            showToast(data.error || 'Error adding to cart', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        this.innerHTML = originalContent;
+                        this.disabled = false;
+                        showToast('Error adding to cart', 'error');
+                    });
+                });
+            });
+
+            // Toast notification function
+            function showToast(message, type = 'info') {
+                const toast = document.createElement('div');
+                toast.className = `alert alert-${type === 'error' ? 'danger' : type === 'success' ? 'success' : 'info'} position-fixed top-0 end-0 m-3`;
+                toast.style.zIndex = '9999';
+                toast.style.minWidth = '300px';
+                toast.innerHTML = `
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-${type === 'error' ? 'x-circle' : type === 'success' ? 'check-circle' : 'info-circle'} me-2"></i>
+                        ${message}
+                    </div>
+                `;
+                
+                document.body.appendChild(toast);
+                
+                // Auto remove after 3 seconds
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    toast.style.transition = 'opacity 0.3s ease';
+                    setTimeout(() => {
+                        document.body.removeChild(toast);
+                    }, 300);
+                }, 3000);
+            }
+        });
+    </script>
+{% endblock %}
+

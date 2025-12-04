@@ -1,0 +1,118 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Home - Libria{% endblock %}
+
+{% block body %}
+<div class="hero-section d-flex align-items-center justify-content-center" style="min-height: 350px;">
+    <div class="container text-center position-relative" style="z-index: 2;max-width:700px;">
+        <div class="mb-4 mt-2">
+            <i class="bi bi-book-half" style="font-size: 3rem; color: var(--caramel);"></i>
+        </div>
+        <div id="quoteCarousel" class="carousel slide carousel-fade mb-4" data-bs-ride="carousel" data-bs-interval="5200">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <blockquote class="fs-3 lh-base fw-semibold font-italic mb-3 quote-pop" style="font-family:'Playfair Display',serif; animation: popfade 1.2s cubic-bezier(.47,1.64,.41,.8);">
+                        “A room without books is like a body without a soul.”
+                    </blockquote>
+                    <div class="fs-6 text-muted mb-2"><em>— Marcus Tullius Cicero</em></div>
+                </div>
+                <div class="carousel-item">
+                    <blockquote class="fs-3 lh-base fw-semibold font-italic mb-3 quote-pop" style="font-family:'Playfair Display',serif; animation: popfade 1.2s cubic-bezier(.47,1.64,.41,.8);">
+                        “Books are a uniquely portable magic.”
+                    </blockquote>
+                    <div class="fs-6 text-muted mb-2"><em>— Stephen King</em></div>
+                </div>
+                <div class="carousel-item">
+                    <blockquote class="fs-3 lh-base fw-semibold font-italic mb-3 quote-pop" style="font-family:'Playfair Display',serif; animation: popfade 1.2s cubic-bezier(.47,1.64,.41,.8);">
+                        “The only thing that you absolutely have to know, is the location of the library.”
+                    </blockquote>
+                    <div class="fs-6 text-muted mb-2"><em>— Albert Einstein</em></div>
+                </div>
+            </div>
+            <style>
+            @keyframes popfade {
+                0% {
+                    opacity: 0;
+                    transform: scale(0.9);
+                }
+                60% {
+                    opacity: 1;
+                    transform: scale(1.05);
+                }
+                100% {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+            }
+            </style>
+        </div>
+        <a href="{{ path('books') }}" class="btn btn-light btn-lg shadow-lg px-4 fw-bold mt-3" style="border-radius: 0.75rem;">
+            <i class="bi bi-bookshelf"></i> Browse Books
+        </a>
+        {% if is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('admin') }}" class="btn btn-library btn-lg shadow-lg ms-3 px-4 mt-3">
+                <i class="bi bi-speedometer2"></i> Admin Dashboard
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="container" style="position: relative; z-index: 1;">
+    <div class="row mb-5">
+        <div class="col-md-4 mb-4">
+            <div class="library-card text-center p-4 h-100">
+                <div style="width: 80px; height: 80px; margin: 0 auto 1.5rem; background: linear-gradient(135deg, var(--coffee), var(--caramel)); border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-md);">
+                    <i class="bi bi-book" style="font-size: 2.5rem; color: white;"></i>
+                </div>
+                <h4 class="mt-3 book-title">Books Collection</h4>
+                <p class="book-meta">Browse and explore our extensive collection of books</p>
+                <a href="{{ path('books') }}" class="btn btn-library mt-3">
+                    <i class="bi bi-arrow-right"></i> View Books
+                </a>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="library-card text-center p-4 h-100">
+                <div style="width: 80px; height: 80px; margin: 0 auto 1.5rem; background: linear-gradient(135deg, var(--caramel), var(--mocca)); border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-md);">
+                    <i class="bi bi-person-badge" style="font-size: 2.5rem; color: white;"></i>
+                </div>
+                <h4 class="mt-3 book-title">Authors</h4>
+                <p class="book-meta">Discover talented authors and their literary works</p>
+                <a href="{{ path('books') }}" class="btn btn-library mt-3">
+                    <i class="bi bi-arrow-right"></i> Explore Authors
+                </a>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="library-card text-center p-4 h-100">
+                <div style="width: 80px; height: 80px; margin: 0 auto 1.5rem; background: linear-gradient(135deg, var(--mocca), var(--coffee)); border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-md);">
+                    <i class="bi bi-building" style="font-size: 2.5rem; color: white;"></i>
+                </div>
+                <h4 class="mt-3 book-title">Publishers</h4>
+                <p class="book-meta">Learn about renowned publishing houses</p>
+                <a href="{{ path('books') }}" class="btn btn-library mt-3">
+                    <i class="bi bi-arrow-right"></i> View Publishers
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% if not app.user %}
+    <div class="row">
+        <div class="col-12">
+            <div class="library-card p-5 text-center">
+                <h3 class="book-title mb-3" style="font-size: 2rem;">Join Our Library Community</h3>
+                <p class="book-meta mb-4 fs-5">Create an account to access all features and manage your reading journey</p>
+                <a href="{{ path('register') }}" class="btn btn-library btn-lg me-3">
+                    <i class="bi bi-person-plus"></i> Register Now
+                </a>
+                <a href="{{ path('login') }}" class="btn btn-outline-primary btn-lg" style="border-width: 2px; font-weight: 600;">
+                    <i class="bi bi-box-arrow-in-right"></i> Login
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+

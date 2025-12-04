@@ -1,0 +1,90 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Order Confirmation - Libria{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="library-card text-center p-5">
+                <div class="mb-4">
+                    <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+                </div>
+                
+                <h1 class="mb-3">Order Placed Successfully!</h1>
+                
+                <p class="lead mb-4">
+                    Thank you for your order. Your order reference is:
+                </p>
+                
+                <div class="alert alert-success d-inline-block">
+                    <h4 class="mb-0">{{ commande.reference }}</h4>
+                </div>
+                
+                <p class="mt-4">
+                    A confirmation email has been sent to your registered email address.
+                </p>
+                
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <h6>Shipping Address</h6>
+                        <p class="text-muted">{{ commande.shippingAddress }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Payment Method</h6>
+                        <p class="text-muted">
+                            {% if commande.paymentMethod == 'credit_card' %}
+                                Credit Card
+                            {% elseif commande.paymentMethod == 'debit_card' %}
+                                Debit Card
+                            {% elseif commande.paymentMethod == 'paypal' %}
+                                PayPal
+                            {% else %}
+                                Bank Transfer
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                
+                <hr class="my-4">
+                
+                <div class="row">
+                    <div class="col-md-8">
+                        <h6>Order Summary</h6>
+                        {% for ligneCommande in commande.ligneCommandes %}
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>{{ ligneCommande.livre.titre }} x{{ ligneCommande.quantity }}</span>
+                                <span>{{ ligneCommande.getFormattedTotal() }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Subtotal:</span>
+                            <span>{{ commande.getFormattedTotal() }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Shipping:</span>
+                            <span>{{ commande.getFormattedShippingCost() }}</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between">
+                            <h6>Total:</h6>
+                            <h6>{{ commande.getGrandTotal() }}</h6>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-center gap-3 mt-4">
+                    <a href="{{ path('orders') }}" class="btn btn-library">
+                        <i class="bi bi-list"></i> View My Orders
+                    </a>
+                    <a href="{{ path('books') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-book"></i> Continue Shopping
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
