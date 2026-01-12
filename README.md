@@ -367,7 +367,7 @@ This project is for **educational purposes**. Feel free to use it as a learning 
 
 ## 📞 Support & Contact
 
-- **📧 Email**: [your-email@example.com]
+- **📧 Email**: [salmaboubaker7@gmail.com]
 - **🐛 Issues**: [GitHub Issues](https://github.com/SalmaIT1/Libria/issues)
 - **💬 Discussions**: [GitHub Discussions](https://github.com/SalmaIT1/Libria/discussions)
 
