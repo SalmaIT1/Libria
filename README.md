@@ -137,56 +137,7 @@ open http://localhost:8000
 
 ## 🏗️ System Architecture
 
-### 📋 Entity Relationships
 
-```mermaid
-erDiagram
-    LIVRE ||--o{ EDITEUR : belongs_to
-    LIVRE }o--o{ AUTEUR : written_by
-    LIVRE }o--o{ CATEGORIE : categorized_as
-    USER ||--o{ LIVRE : manages
-    
-    LIVRE {
-        int id
-        string titre
-        string isbn
-        float prix
-        int nbPages
-        text description
-        string image
-        int nbExemplaires
-        boolean disponible
-    }
-    
-    AUTEUR {
-        int id
-        string nom
-        string prenom
-        text biographie
-        date dateNaissance
-    }
-    
-    EDITEUR {
-        int id
-        string nomEditeur
-        string adresse
-        string telephone
-    }
-    
-    CATEGORIE {
-        int id
-        string nomCategorie
-        text description
-    }
-    
-    USER {
-        int id
-        string email
-        string password
-        array roles
-        datetime createdAt
-    }
-```
 
 ### 📁 Project Structure
 
