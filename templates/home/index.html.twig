@@ -114,5 +114,16 @@
     </div>
     {% endif %}
 </div>
+
+<style>
+    /* Fix icon colors for light/dark mode */
+    .library-card i[style*="color: white"] {
+        color: var(--dark-charcoal) !important;
+    }
+
+    [data-theme='dark'] .library-card i[style*="color: white"] {
+        color: white !important;
+    }
+</style>
 {% endblock %}
 

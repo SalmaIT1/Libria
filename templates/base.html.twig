@@ -1047,11 +1047,26 @@
 
             // Load unread notification count
             function updateNotificationBadge() {
+                const badge = document.getElementById('notification-badge');
+                const countBadge = document.getElementById('notification-count-badge');
+                
+                // First, show cached value immediately
+                const cachedCount = localStorage.getItem('notificationCount');
+                if (cachedCount && parseInt(cachedCount) > 0) {
+                    const count = parseInt(cachedCount) > 99 ? '99+' : cachedCount;
+                    if (badge) {
+                        badge.textContent = count;
+                        badge.style.display = 'block';
+                    }
+                    if (countBadge) {
+                        countBadge.textContent = count;
+                    }
+                }
+                
+                // Then fetch fresh data
                 fetch('/notifications/non-lues')
                     .then(response => response.json())
                     .then(data => {
-                        const badge = document.getElementById('notification-badge');
-                        const countBadge = document.getElementById('notification-count-badge');
                         if (data.count > 0) {
                             const count = data.count > 99 ? '99+' : data.count;
                             if (badge) {
@@ -1061,9 +1076,11 @@
                             if (countBadge) {
                                 countBadge.textContent = count;
                             }
+                            localStorage.setItem('notificationCount', data.count);
                         } else {
                             if (badge) badge.style.display = 'none';
                             if (countBadge) countBadge.textContent = '0';
+                            localStorage.setItem('notificationCount', '0');
                         }
                     });
             }
@@ -1165,6 +1182,10 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
+                        // Update localStorage immediately
+                        if (data.unreadCount !== undefined) {
+                            localStorage.setItem('notificationCount', data.unreadCount);
+                        }
                         element.classList.remove('notification-unread');
                         const link = element.querySelector('.notification-link');
                         if (link) link.classList.remove('fw-semibold');
@@ -1270,19 +1291,30 @@
 
             // Update cart count
             function updateCartCount() {
+                const badge = document.getElementById('cart-badge');
+                const countBadge = document.getElementById('cart-count-badge');
+                
+                // First, show cached value immediately
+                const cachedCount = localStorage.getItem('cartCount');
+                if (cachedCount && parseInt(cachedCount) > 0) {
+                    badge.textContent = cachedCount;
+                    badge.style.display = 'inline-block';
+                    if (countBadge) countBadge.textContent = cachedCount;
+                }
+                
+                // Then fetch fresh data
                 fetch('/cart/count')
                     .then(response => response.json())
                     .then(data => {
-                        const badge = document.getElementById('cart-badge');
-                        const countBadge = document.getElementById('cart-count-badge');
-                        
                         if (data.count > 0) {
                             badge.textContent = data.count;
                             badge.style.display = 'inline-block';
-                            countBadge.textContent = data.count;
+                            if (countBadge) countBadge.textContent = data.count;
+                            localStorage.setItem('cartCount', data.count);
                         } else {
                             badge.style.display = 'none';
-                            countBadge.textContent = '0';
+                            if (countBadge) countBadge.textContent = '0';
+                            localStorage.setItem('cartCount', '0');
                         }
                         
                         // Also refresh cart dropdown if open
@@ -1392,6 +1424,9 @@
 
             // Update cart count on page load
             document.addEventListener('DOMContentLoaded', updateCartCount);
+            
+            // Update notification badge on page load
+            document.addEventListener('DOMContentLoaded', updateNotificationBadge);
 
             // Shared Confirmation Modal System
             let sharedPendingAction = null;

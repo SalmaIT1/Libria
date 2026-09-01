@@ -1092,6 +1092,8 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
+                // Update localStorage immediately
+                localStorage.setItem('cartCount', data.cartCount);
                 // Update input
                 const input = document.querySelector(`input[data-ligne-id="${ligneId}"]`);
                 input.value = quantity;
@@ -1131,6 +1133,8 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
+                // Update localStorage immediately
+                localStorage.setItem('cartCount', data.cartCount);
                 // Update cart count
                 updateCartCount();
                 
@@ -1173,6 +1177,8 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
+                // Update localStorage immediately
+                localStorage.setItem('cartCount', data.cartCount);
                 updateCartCount();
                 showNotification('Cart cleared', 'success');
                 setTimeout(() => location.reload(), 500);

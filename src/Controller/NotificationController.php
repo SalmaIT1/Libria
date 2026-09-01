@@ -55,7 +55,12 @@ class NotificationController extends AbstractController
         $notification->setLu(true);
         $entityManager->flush();
 
-        return $this->json(['success' => true]);
+        $unreadCount = $notificationRepository->count([
+            'user' => $user,
+            'lu' => false
+        ]);
+
+        return $this->json(['success' => true, 'unreadCount' => $unreadCount]);
     }
 
     #[Route('/notifications/marquer-toutes-lues', name: 'notification_mark_all_read', methods: ['POST'])]
@@ -78,7 +83,12 @@ class NotificationController extends AbstractController
 
         $entityManager->flush();
 
-        return $this->json(['success' => true, 'count' => count($notifications)]);
+        $unreadCount = $notificationRepository->count([
+            'user' => $user,
+            'lu' => false
+        ]);
+
+        return $this->json(['success' => true, 'count' => count($notifications), 'unreadCount' => $unreadCount]);
     }
 
     #[Route('/notifications/non-lues', name: 'notification_unread_count', methods: ['GET'])]

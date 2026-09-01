@@ -597,6 +597,8 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
+                            // Update localStorage immediately
+                            localStorage.setItem('cartCount', data.cartCount);
                             // Update cart count in navbar
                             if (typeof updateCartCount === 'function') {
                                 updateCartCount();

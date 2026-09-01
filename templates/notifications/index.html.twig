@@ -94,6 +94,11 @@ document.getElementById('markAllRead')?.addEventListener('click', async function
         headers: {'Content-Type': 'application/json'}
     });
     if (response.ok) {
+        const data = await response.json();
+        // Update localStorage immediately
+        if (data.unreadCount !== undefined) {
+            localStorage.setItem('notificationCount', data.unreadCount);
+        }
         location.reload();
     }
 });
