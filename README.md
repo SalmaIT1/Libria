@@ -49,6 +49,40 @@ Full CRUD interface for managing all library resources:
 - **MySQL 8.0+** database server
 - **Symfony CLI** (optional, for development)
 
+### ☁️ Railway Deployment (Recommended for Live Demo)
+
+Railway provides excellent PHP support and is perfect for hosting Symfony applications:
+
+1. **Create a Railway account** at [railway.app](https://railway.app)
+2. **Install Railway CLI** (optional):
+   ```bash
+   npm install -g @railway/cli
+   railway login
+   ```
+3. **Initialize Railway project**:
+   ```bash
+   railway init
+   ```
+4. **Add MySQL database**:
+   ```bash
+   railway add mysql
+   ```
+5. **Deploy**:
+   ```bash
+   railway up
+   ```
+6. **Run migrations** (via Railway console):
+   ```bash
+   railway run php bin/console doctrine:migrations:migrate
+   railway run php bin/console doctrine:fixtures:load
+   ```
+
+Railway will automatically:
+- Set up a MySQL database
+- Configure environment variables
+- Deploy your Symfony application
+- Provide a public URL for your live demo
+
 ### ⚡ One-Click Setup (Docker)
 
 ```bash
