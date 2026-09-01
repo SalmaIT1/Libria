@@ -24,7 +24,8 @@ WORKDIR /app
 COPY . .
 
 # Install dependencies
-RUN composer install --no-interaction --optimize-autoloader --no-dev
+ENV COMPOSER_ALLOW_SUPERUSER=1
+RUN composer install --no-interaction --optimize-autoloader --no-dev --no-scripts
 
 # Set permissions
 RUN chown -R www-data:www-data /app/var
