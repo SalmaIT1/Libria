@@ -25,10 +25,11 @@ COPY . .
 
 # Install dependencies
 ENV COMPOSER_ALLOW_SUPERUSER=1
-RUN composer install --no-interaction --optimize-autoloader --no-dev --no-scripts
+RUN composer install --no-interaction --optimize-autoloader --no-dev
 
-# Set permissions
-RUN chown -R www-data:www-data /app/var
+# Create var directory and set permissions
+RUN mkdir -p /app/var/cache /app/var/log && \
+    chown -R www-data:www-data /app/var
 
 # Expose port
 EXPOSE 8000
